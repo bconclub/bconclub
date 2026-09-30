@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Header (Glass Pill)</title>
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 60px 24px 24px; justify-content: flex-start; }
+  .header {
+    margin: 0 auto;
+    padding: 14px 14px 14px 28px;
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: 999px;
+    box-shadow: 0 4px 24px rgba(16, 4, 66, 0.30);
+    display: flex; align-items: center; gap: 28px;
+    width: 760px; max-width: 100%;
+  }
+  .header__brand img { height: 24px; display: block; }
+  .nav { display: flex; gap: 28px; align-items: center; margin-left: auto; }
+  .nav a { color: #fff; font-size: 14px; font-weight: 500; text-decoration: none; font-family: var(--font-sans); }
+  .deploy {
+    padding: 8px 18px; font-size: 13px; font-weight: 500; color: #fff;
+    background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.30);
+    border-radius: 999px; font-family: var(--font-sans); cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <header class="header">
+      <span class="header__brand"><img src="../assets/logo/PROXe-Wordmark.svg" alt="PROXe" /></span>
+      <nav class="nav">
+        <a>Features</a>
+        <a>Pricing</a>
+        <a>Channels</a>
+      </nav>
+      <button class="deploy">Deploy PROXe</button>
+    </header>
+  </div>
+</body>
+</html>

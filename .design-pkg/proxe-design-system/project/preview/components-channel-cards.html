@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Channel Cards</title>
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 24px 32px; justify-content: center; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .sc {
+    padding: 22px 20px; border-radius: 22px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(28px) saturate(140%);
+    box-shadow: 0 18px 40px rgba(16, 4, 66, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    display: flex; flex-direction: column; gap: 10px; position: relative;
+  }
+  .ico { width: 34px; height: 34px;
+    -webkit-mask-size: contain; mask-size: contain;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: center; mask-position: center;
+  }
+  .sc[data-id="web"]      .ico { background: linear-gradient(135deg,#3B82F6,#10B981); -webkit-mask-image: url(../assets/icons/browser-stroke-rounded.svg); mask-image: url(../assets/icons/browser-stroke-rounded.svg); }
+  .sc[data-id="whatsapp"] .ico { background: linear-gradient(135deg,#84CC16,#166534); -webkit-mask-image: url(../assets/icons/whatsapp-business-stroke-rounded.svg); mask-image: url(../assets/icons/whatsapp-business-stroke-rounded.svg); }
+  .sc[data-id="voice"]    .ico { background: linear-gradient(135deg,#FEF3C7,#D97706); -webkit-mask-image: url(../assets/icons/ai-voice-stroke-rounded.svg); mask-image: url(../assets/icons/ai-voice-stroke-rounded.svg); }
+  .sc[data-id="social"]   .ico { background: linear-gradient(135deg,#EC4899,#7C3AED); -webkit-mask-image: url(../assets/icons/video-ai-stroke-rounded.svg); mask-image: url(../assets/icons/video-ai-stroke-rounded.svg); }
+  .ti { font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: #fff; margin: 0; }
+  .tg { font-size: 12px; color: rgba(255,255,255,0.85); margin: 0; line-height: 1.5; }
+  .plus { position: absolute; top: 16px; right: 18px; font-size: 16px; color: rgba(255,255,255,0.85); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="grid">
+      <article class="sc" data-id="web"><span class="plus">+</span><span class="ico"></span><h3 class="ti">Website PROXe</h3><p class="tg">AI sales agent that lives on your site 24/7.</p></article>
+      <article class="sc" data-id="whatsapp"><span class="plus">+</span><span class="ico"></span><h3 class="ti">WhatsApp PROXe</h3><p class="tg">AI that runs your WhatsApp like a top SDR.</p></article>
+      <article class="sc" data-id="voice"><span class="plus">+</span><span class="ico"></span><h3 class="ti">Voice PROXe</h3><p class="tg">AI phone rep who never puts anyone on hold.</p></article>
+      <article class="sc" data-id="social"><span class="plus">+</span><span class="ico"></span><h3 class="ti">Social PROXe</h3><p class="tg">Social AI for no missed comments and DMs.</p></article>
+    </div>
+  </div>
+</body>
+</html>

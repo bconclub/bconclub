@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Iconography</title>
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 28px 32px; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+  .ic {
+    aspect-ratio: 1/1; border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ic img { width: 50%; height: 50%; filter: invert(95%); opacity: 0.9; }
+  .lab { font-family: var(--font-mono); font-size: 9px; color: var(--fg-4); text-align: center; margin-top: 6px; letter-spacing: 0.04em; }
+  .col { display: flex; flex-direction: column; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="grid">
+      <div class="col"><div class="ic"><img src="../assets/icons/browser-stroke-rounded.svg"/></div><span class="lab">browser</span></div>
+      <div class="col"><div class="ic"><img src="../assets/icons/whatsapp-business-stroke-rounded.svg"/></div><span class="lab">whatsapp</span></div>
+      <div class="col"><div class="ic"><img src="../assets/icons/ai-voice-stroke-rounded.svg"/></div><span class="lab">voice</span></div>
+      <div class="col"><div class="ic"><img src="../assets/icons/video-ai-stroke-rounded.svg"/></div><span class="lab">video / social</span></div>
+      <div class="col"><div class="ic"><img src="../assets/icons/bubble-chat-stroke-rounded.svg"/></div><span class="lab">chat</span></div>
+      <div class="col"><div class="ic"><img src="../assets/icons/infinity.svg"/></div><span class="lab">infinity</span></div>
+    </div>
+  </div>
+</body>
+</html>

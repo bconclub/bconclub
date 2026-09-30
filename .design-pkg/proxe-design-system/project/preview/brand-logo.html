@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Logo</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 28px 32px; }
+
+  .title-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 24px; margin-bottom: 4px;
+  }
+  .title-row h2 {
+    font-family: var(--font-display); font-weight: 400;
+    font-size: 30px; letter-spacing: -0.01em; margin: 0; color: #0E0526;
+  }
+  .lede {
+    font-family: var(--font-sans); font-size: 13px; line-height: 1.55;
+    color: rgba(14, 5, 38, 0.66); max-width: 700px; margin: 0 0 20px;
+  }
+
+  /* ---- hero showcase: full wordmark on the brand gradient ---- */
+  .hero {
+    border-radius: 18px; overflow: hidden; position: relative;
+    isolation: isolate; padding: 64px 56px;
+    border: 1px solid rgba(14,5,38,0.10);
+    background: var(--bg-hero-gradient);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 240px;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: var(--bg-vignette);
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; z-index: 2;
+    background-image: var(--bg-grain-url);
+    background-size: var(--bg-grain-tile) var(--bg-grain-tile);
+    opacity: var(--bg-grain-alpha);
+    mix-blend-mode: var(--bg-grain-blend);
+  }
+  .hero img {
+    position: relative; z-index: 3;
+    width: min(560px, 70%); height: auto;
+    filter: drop-shadow(0 4px 18px rgba(16, 4, 66, 0.35));
+  }
+  .hero .corner {
+    position: absolute; left: 18px; top: 14px; z-index: 4;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: rgba(255,255,255,0.78);
+  }
+
+  /* ---- variant grid ---- */
+  .grid {
+    margin-top: 16px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  }
+  .tile {
+    border-radius: 14px; padding: 24px;
+    border: 1px solid rgba(14,5,38,0.10);
+    display: flex; align-items: center; justify-content: center;
+    aspect-ratio: 1 / 1;
+    position: relative; overflow: hidden; isolation: isolate;
+  }
+  .tile.white  { background: #FDFEFD; }
+  .tile.black  { background: #0A0A0A; }
+  .tile.violet { background: var(--bg-hero-gradient); }
+  .tile.violet::after {
+    content:""; position:absolute; inset:0; z-index:1;
+    background-image: var(--bg-grain-url);
+    background-size: var(--bg-grain-tile) var(--bg-grain-tile);
+    opacity: var(--bg-grain-alpha);
+    mix-blend-mode: var(--bg-grain-blend);
+  }
+  .tile.deep   { background: #100442; }
+  .tile img {
+    position: relative; z-index: 2;
+    max-width: 78%;
+    max-height: 70%;
+    width: auto; height: auto;
+  }
+  .tile.icon img { max-width: 56%; max-height: 56%; }
+
+  .tile .lbl {
+    position: absolute; left: 12px; bottom: 10px; z-index: 3;
+    font-family: var(--font-mono); font-size: 9.5px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .tile.white .lbl { color: rgba(14,5,38,0.55); }
+  .tile.black .lbl,
+  .tile.violet .lbl,
+  .tile.deep .lbl  { color: rgba(255,255,255,0.72); }
+
+  /* ---- spec strip ---- */
+  .spec {
+    margin-top: 18px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  .spec-card {
+    padding: 14px 16px; border-radius: 12px;
+    background: rgba(14,5,38,0.04);
+    border: 1px solid rgba(14,5,38,0.08);
+  }
+  .spec-card h4 {
+    font-family: var(--font-sans); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    color: rgba(14,5,38,0.55); margin: 0 0 6px;
+  }
+  .spec-card p {
+    font-family: var(--font-sans); font-size: 13px; line-height: 1.5;
+    color: rgba(14,5,38,0.82); margin: 0;
+  }
+  .spec-card code {
+    font-family: var(--font-mono); font-size: 11.5px;
+    color: #4B1FE5; background: rgba(75,31,229,0.08);
+    padding: 1px 5px; border-radius: 4px;
+  }
+
+  /* ---- clear-space + min-size diagram ---- */
+  .rules {
+    margin-top: 16px;
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px;
+  }
+  .rule-card {
+    padding: 22px 24px; border-radius: 14px;
+    border: 1px solid rgba(14,5,38,0.10);
+    background: #FAFAFA;
+    position: relative;
+  }
+  .rule-card h4 {
+    font-family: var(--font-sans); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    color: rgba(14,5,38,0.55); margin: 0 0 14px;
+  }
+  .clear-frame {
+    position: relative;
+    padding: 32px;
+    border: 1px dashed rgba(75,31,229,0.45);
+    border-radius: 8px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .clear-frame img { width: 220px; height: auto; }
+  .clear-frame .x {
+    position: absolute; font-family: var(--font-mono); font-size: 10px;
+    color: #4B1FE5; letter-spacing: 0.06em;
+  }
+  .clear-frame .x.t { top: 8px; left: 50%; transform: translateX(-50%); }
+  .clear-frame .x.b { bottom: 8px; left: 50%; transform: translateX(-50%); }
+  .clear-frame .x.l { left: 8px; top: 50%; transform: translateY(-50%); }
+  .clear-frame .x.r { right: 8px; top: 50%; transform: translateY(-50%); }
+
+  .min-row {
+    display: flex; align-items: flex-end; gap: 22px; padding: 8px 0 0;
+  }
+  .min-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .min-cell img { display: block; }
+  .min-cell .px {
+    font-family: var(--font-mono); font-size: 10px;
+    color: rgba(14,5,38,0.55); letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="title-row">
+      <h2>Logo</h2>
+    </div>
+    <p class="lede">
+      The PROXe wordmark — a custom geometric sans where the <b>O</b> and <b>X</b>
+      become the system's icon. Treat the wordmark as the primary brand mark; use
+      the standalone icon only when the surface is too small for the full mark
+      (favicon, app tile, chat avatar). White on violet is the default lockup.
+    </p>
+
+    <!-- HERO showcase -->
+    <div class="hero">
+      <span class="corner">Primary lockup · white on hero gradient</span>
+      <img src="../assets/logo/PROXe-Wordmark-White.png" alt="PROXe wordmark" />
+    </div>
+
+    <!-- VARIANTS -->
+    <div class="grid">
+      <div class="tile violet">
+        <img src="../assets/logo/PROXe-Wordmark-White.png" alt="PROXe wordmark white on violet" />
+        <span class="lbl">Wordmark · White / Violet</span>
+      </div>
+      <div class="tile deep">
+        <img src="../assets/logo/PROXe-Wordmark-White.png" alt="PROXe wordmark white on deep" />
+        <span class="lbl">Wordmark · White / Deep</span>
+      </div>
+      <div class="tile white">
+        <img src="../assets/logo/PROXe-Wordmark-Black.webp" alt="PROXe wordmark black on white" />
+        <span class="lbl">Wordmark · Black / White</span>
+      </div>
+      <div class="tile black">
+        <img src="../assets/logo/PROXe-Wordmark-White.png" alt="PROXe wordmark white on black" />
+        <span class="lbl">Wordmark · White / Black</span>
+      </div>
+
+      <div class="tile violet icon">
+        <img src="../assets/logo/PROXe-Icon-White.png" alt="PROXe icon white on violet" />
+        <span class="lbl">Icon · White / Violet</span>
+      </div>
+      <div class="tile deep icon">
+        <img src="../assets/logo/PROXe-Icon-White.png" alt="PROXe icon white on deep" />
+        <span class="lbl">Icon · White / Deep</span>
+      </div>
+      <div class="tile white icon">
+        <img src="../assets/logo/PROXe-Icon-Black.webp" alt="PROXe icon black on white" />
+        <span class="lbl">Icon · Black / White</span>
+      </div>
+      <div class="tile black icon">
+        <img src="../assets/logo/PROXe-Icon-White.png" alt="PROXe icon white on black" />
+        <span class="lbl">Icon · White / Black</span>
+      </div>
+    </div>
+
+    <!-- SPEC -->
+    <div class="spec">
+      <div class="spec-card">
+        <h4>Wordmark · file</h4>
+        <p><code>assets/logo/PROXe-Wordmark-Black.webp</code> &nbsp;·&nbsp; <code>PROXe-Wordmark-White.png</code></p>
+      </div>
+      <div class="spec-card">
+        <h4>Icon · file</h4>
+        <p><code>assets/logo/PROXe-Icon-Black.webp</code> &nbsp;·&nbsp; <code>PROXe-Icon-White.png</code></p>
+      </div>
+      <div class="spec-card">
+        <h4>Casing</h4>
+        <p>Always <b>PROXe</b> — caps PROX, lowercase e. Never Proxe, PROxe, or proxe.</p>
+      </div>
+    </div>
+
+    <!-- RULES -->
+    <div class="rules">
+      <div class="rule-card">
+        <h4>Clear space — at least 1× the cap height on every side</h4>
+        <div class="clear-frame">
+          <span class="x t">1×</span>
+          <span class="x b">1×</span>
+          <span class="x l">1×</span>
+          <span class="x r">1×</span>
+          <img src="../assets/logo/PROXe-Wordmark-Black.webp" alt="PROXe wordmark with clear space"/>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <h4>Minimum size</h4>
+        <div class="min-row">
+          <div class="min-cell">
+            <img src="../assets/logo/PROXe-Wordmark-Black.webp" alt="PROXe wordmark min size" style="width:120px"/>
+            <span class="px">Wordmark · 120px min</span>
+          </div>
+          <div class="min-cell">
+            <img src="../assets/logo/PROXe-Icon-Black.webp" alt="PROXe icon min size" style="width:32px"/>
+            <span class="px">Icon · 32px min</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

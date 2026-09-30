@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Spacing</title>
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 24px 32px; gap: 6px; justify-content: center; }
+  .row-s { display: flex; align-items: center; gap: 16px; padding: 4px 0; }
+  .label { width: 110px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-3); }
+  .bar { background: linear-gradient(90deg, var(--proxe-violet), var(--proxe-violet-bright)); height: 12px; border-radius: 6px; box-shadow: 0 0 16px rgba(75, 31, 229, 0.45); }
+  .px { font-family: var(--font-mono); font-size: 11px; color: var(--fg-4); margin-left: 8px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="row-s"><span class="label">--s-1</span><div class="bar" style="width:4px"></div><span class="px">4 px</span></div>
+    <div class="row-s"><span class="label">--s-2</span><div class="bar" style="width:8px"></div><span class="px">8 px</span></div>
+    <div class="row-s"><span class="label">--s-3</span><div class="bar" style="width:12px"></div><span class="px">12 px</span></div>
+    <div class="row-s"><span class="label">--s-4</span><div class="bar" style="width:16px"></div><span class="px">16 px</span></div>
+    <div class="row-s"><span class="label">--s-5</span><div class="bar" style="width:24px"></div><span class="px">24 px</span></div>
+    <div class="row-s"><span class="label">--s-6</span><div class="bar" style="width:32px"></div><span class="px">32 px · card padding</span></div>
+    <div class="row-s"><span class="label">--s-7</span><div class="bar" style="width:48px"></div><span class="px">48 px</span></div>
+    <div class="row-s"><span class="label">--s-8</span><div class="bar" style="width:80px"></div><span class="px">80 px</span></div>
+    <div class="row-s"><span class="label">--s-9</span><div class="bar" style="width:120px"></div><span class="px">120 px · section padding</span></div>
+  </div>
+</body>
+</html>

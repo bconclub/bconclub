@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Radii</title>
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 24px 32px; justify-content: center; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+  .tile { aspect-ratio: 1; background: var(--glass-bg); border: 1px solid var(--border-violet); box-shadow: var(--shadow-md); display: flex; align-items: end; padding: 8px; backdrop-filter: var(--blur-md); }
+  .name { font-family: var(--font-mono); font-size: 10px; color: var(--fg-3); letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="grid">
+      <div><div class="tile" style="border-radius:8px"></div><div class="name" style="margin-top:6px">8 · sm</div></div>
+      <div><div class="tile" style="border-radius:12px"></div><div class="name" style="margin-top:6px">12 · md (button)</div></div>
+      <div><div class="tile" style="border-radius:16px"></div><div class="name" style="margin-top:6px">16 · lg</div></div>
+      <div><div class="tile" style="border-radius:23px"></div><div class="name" style="margin-top:6px">23 · header</div></div>
+      <div><div class="tile" style="border-radius:24px"></div><div class="name" style="margin-top:6px">24 · 2xl card</div></div>
+      <div><div class="tile" style="border-radius:999px"></div><div class="name" style="margin-top:6px">∞ · pill</div></div>
+    </div>
+  </div>
+</body>
+</html>

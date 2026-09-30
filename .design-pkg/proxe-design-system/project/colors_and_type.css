@@ -1,0 +1,365 @@
+/* =========================================================
+   PROXe Design System — Colors & Type Tokens
+   Source: bconclub/proxe-site (proxe/src/styles/theme.css,
+   page.module.css, brand.config.ts) and live site
+   bconclub.com/proxe.
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap");
+
+:root {
+  /* ---------- BRAND PALETTE ---------- */
+  /* The hero ground truth is a saturated electric indigo-violet with film grain
+     and a deep-violet vignette at the lower-right. The palette is intentionally
+     monochromatic: 4 violet stops + white. No purple, no blue, no cyan. */
+  --proxe-violet:         #4B1FE5;  /* PRIMARY — the hero / page background */
+  --proxe-violet-bright:  #6B47F0;  /* hover / highlight       */
+  --proxe-violet-deep:    #2A0EAF;  /* vignette / pressed      */
+  --proxe-violet-darkest: #100442;  /* corner shadow anchor    */
+
+  --proxe-fg-on-violet:  #FFFFFF;
+  --proxe-cta-bg:        #FFFFFF;   /* white pill CTA on violet */
+  --proxe-cta-knob:      #0A0A0A;   /* black circle send button */
+
+  /* Channel gradient pair colors — used as channel ID accents */
+  --ch-web-from:        #3B82F6;
+  --ch-web-to:          #10B981;
+  --ch-whatsapp-from:   #84CC16;
+  --ch-whatsapp-to:     #166534;
+  --ch-voice-from:      #FEF3C7;
+  --ch-voice-to:        #D97706;
+  --ch-social-from:     #EC4899;
+  --ch-social-to:       #7C3AED;
+  --ch-email-from:      #8B5CF6;
+  --ch-email-to:        #6366F1;
+  --ch-sms-from:        #3B82F6;
+  --ch-sms-to:          #1E40AF;
+
+  /* ---------- NEUTRALS ---------- */
+  --bg-0:    #4B1FE5;   /* PAGE BG — electric violet (hero ground truth)   */
+  --bg-near-black: #0A0A0A; /* deep panels, app shell, footer plate        */
+  --bg-1:    #0F0D0F;   /* chatbox bg */
+  --bg-2:    #13162C;   /* card mix base */
+  --bg-3:    #1A1230;   /* elevated */
+
+  --white:   #FDFEFD;
+
+  /* ---------- BACKGROUND RECIPE ----------
+     The signature PROXe page background is a 3-layer stack, sampled directly
+     from the live hero (assets/imagery/hero-gradient-reference.png):
+
+       1. Hero gradient — a single large radial bloom anchored upper-left
+          (~20% 30%), peaking at the bright electric violet hot-spot
+          #7916FF and falling all the way to the navy-violet anchor #100442
+          in the lower-right. It is NOT a flat plate; the gradient is the
+          page color.
+       2. Vignette tint — a soft second radial in the bottom-right corner
+          that pushes the darkest area below #100442 into near-black, the
+          way a 35mm scan vignettes.
+       3. Film grain  — assets/imagery/grain.png, 220px tile, ~10–14 sd
+          monochrome noise, blended over the gradient. Without the grain
+          the gradient looks digital; the grain is the brand signal.
+
+     Layer order in CSS (top → bottom of the stack written first → last):
+       grain  ·  corner vignette  ·  hero gradient  ·  fallback color.
+     Apply via `.px-page-bg`, or use the variables directly. */
+
+  /* The hero gradient — exact stops from sampling the reference. */
+  --bg-hero-hotspot:  #7916FF;   /* upper-left bloom peak     */
+  --bg-hero-mid:      #4B1FE5;   /* mid-fall electric violet  */
+  --bg-hero-shadow:   #1A0570;   /* deep violet pre-anchor    */
+  --bg-hero-anchor:   #100442;   /* lower-right anchor        */
+
+  --bg-hero-gradient:
+      radial-gradient(ellipse 130% 110% at 22% 28%,
+        #7916FF 0%,
+        #6B11F5 18%,
+        #4B1FE5 42%,
+        #2A0EAF 65%,
+        #1A0570 82%,
+        #100442 100%);
+
+  /* Corner vignette — second pass, deepens the lower-right beyond the
+     gradient's own anchor color. Keeps the BR weighty even when the page
+     is shorter than the gradient ellipse. */
+  --bg-vignette:
+      radial-gradient(ellipse 60% 70% at 95% 100%,
+        rgba(7, 0, 33, 0.70) 0%,
+        rgba(16, 4, 66, 0.45) 30%,
+        rgba(16, 4, 66, 0.00) 70%);
+
+  /* Film grain — a 256px monochrome noise tile. Tile at 220px so individual
+     grains read as fine 35mm and not blocky 8-bit. Overlay blend keeps the
+     grain bright in light areas and dark in shadows; opacity ~0.16 matches
+     the reference's measured ~10 sd luminance. */
+  --bg-grain-url:    url("assets/imagery/grain.png");
+  --bg-grain-tile:   220px;
+  --bg-grain-alpha:  0.16;
+  --bg-grain-blend:  overlay;
+
+  /* Convenience composite — pass straight to `background:` (without grain;
+     grain has to live on a separate layer because of mix-blend-mode). */
+  --bg-page:         var(--bg-hero-gradient);
+  --bg-page-fallback: #4B1FE5;
+
+  /* ---------- TEXT (white on violet) ---------- */
+  --fg-1:    #FFFFFF;                     /* high emphasis: hero, headings  */
+  --fg-2:    rgba(255, 255, 255, 0.92);   /* default body                    */
+  --fg-3:    rgba(255, 255, 255, 0.78);   /* muted body                      */
+  --fg-4:    rgba(255, 255, 255, 0.62);   /* eyebrow / subtle                */
+  --fg-5:    rgba(255, 255, 255, 0.40);   /* disabled                        */
+
+  /* ---------- BORDERS ---------- */
+  --border-faint:   rgba(255, 255, 255, 0.10);
+  --border-soft:    rgba(255, 255, 255, 0.18);
+  --border-strong:  rgba(255, 255, 255, 0.30);
+  --border-violet:  rgba(255, 255, 255, 0.22);  /* card edge on violet bg  */
+  --border-glow:    rgba(255, 255, 255, 0.45);  /* hover edge              */
+
+  /* ---------- GLASS / SURFACES ----------
+     The PROXe surface vocabulary is "violet glass":
+     a 160deg gradient from translucent violet → deep card,
+     soft inner highlight, big violet border, heavy blur. */
+  --glass-bg:        linear-gradient(160deg,
+                       rgba(255, 255, 255, 0.10),
+                       rgba(255, 255, 255, 0.04));
+  --glass-bg-soft:   linear-gradient(160deg,
+                       rgba(255, 255, 255, 0.06),
+                       rgba(255, 255, 255, 0.02));
+  --glass-border:    1px solid var(--border-violet);
+  --glass-border-hover: 1px solid var(--border-glow);
+  --glass-shadow:    0 18px 40px rgba(0, 0, 0, 0.35),
+                     inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --glass-shadow-hover: 0 26px 48px rgba(0, 0, 0, 0.45),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* ---------- BLUR ---------- */
+  --blur-sm: blur(8px);
+  --blur-md: blur(16px);
+  --blur-lg: blur(28px);          /* default for card glass    */
+  --blur-xl: blur(40px) saturate(180%);  /* header / chat input */
+
+  /* ---------- RADII ---------- */
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  16px;
+  --r-xl:  23px;     /* header pill                          */
+  --r-2xl: 24px;     /* cards (most common in product)       */
+  --r-pill: 999px;
+
+  /* ---------- SPACING (8 base) ---------- */
+  --s-1:  4px;
+  --s-2:  8px;
+  --s-3:  12px;
+  --s-4:  16px;
+  --s-5:  24px;
+  --s-6:  32px;
+  --s-7:  48px;
+  --s-8:  80px;
+  --s-9:  120px;     /* section vertical padding             */
+
+  /* ---------- ELEVATION ---------- */
+  --shadow-sm:  0 4px 12px rgba(0, 0, 0, 0.30);
+  --shadow-md:  0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg:  0 18px 40px rgba(0, 0, 0, 0.35);
+  --shadow-xl:  0 26px 48px rgba(0, 0, 0, 0.45);
+  --shadow-violet-glow:  0 0 30px rgba(75, 31, 229, 0.30);
+
+  /* ---------- MOTION ---------- */
+  --ease-out:   cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast:     150ms;
+  --t-base:     300ms;
+  --t-slow:     600ms;
+
+  /* ---------- TYPOGRAPHY ---------- */
+  /* The user spec: Instrument Serif for headings.
+     Body & UI: Exo 2 (matches the live product). */
+  --font-display: "Instrument Serif", "Times New Roman", Georgia, serif;
+  --font-sans:    "Exo 2", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                  Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  /* Type scale — tuned to live page.module.css references.    */
+  --fs-eyebrow: 12px;
+  --fs-label:   14px;
+  --fs-body:    16px;
+  --fs-body-lg: 20px;       /* sectionSubtitle */
+  --fs-h4:      24px;
+  --fs-h3:      32px;
+  --fs-h2:      45px;       /* sectionHeading  */
+  --fs-h1:      66px;       /* heroTitle       */
+  --fs-display: 96px;
+
+  --lh-tight:   1.10;
+  --lh-snug:    1.20;
+  --lh-normal:  1.50;
+  --lh-loose:   1.60;
+
+  --tracking-display: -0.02em;
+  --tracking-tight:   -0.01em;
+  --tracking-eyebrow:  0.10em;
+}
+
+/* =========================================================
+   SEMANTIC ROLES — element-level vars
+   Use these in components instead of raw palette tokens.
+   ========================================================= */
+:root {
+  --color-bg:           var(--bg-0);
+  --color-surface:      var(--glass-bg);
+  --color-surface-soft: var(--glass-bg-soft);
+
+  --color-fg:           var(--fg-1);
+  --color-fg-muted:     var(--fg-3);
+  --color-fg-subtle:    var(--fg-4);
+
+  --color-accent:       var(--proxe-violet);
+  --color-accent-deep:  var(--proxe-violet-deep);
+  --color-success:      #10B981;
+  --color-warning:      #FACC15;
+  --color-danger:       #EF4444;
+
+  --color-border:       var(--border-violet);
+  --color-border-hover: var(--border-glow);
+}
+
+/* =========================================================
+   BASE TYPOGRAPHY + PAGE BACKGROUND
+   ========================================================= */
+html, body {
+  background-color: var(--bg-page-fallback);
+  background-image: var(--bg-hero-gradient);
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================================================
+   THE PROXe page background recipe.
+   Apply `.px-page-bg` to <body> or any full-bleed wrapper.
+   Layer stack (CSS paint order: ::after on top, ::before below,
+   element bg at the bottom):
+
+     ┌──────────────────────────┐
+     │  ::after  — film grain   │  overlay · 0.16 · 220px tile
+     ├──────────────────────────┤
+     │  ::before — BR vignette  │  radial · navy-violet
+     ├──────────────────────────┤
+     │  element  — hero gradient│  radial · #7916FF → #100442
+     └──────────────────────────┘
+   ========================================================= */
+.px-page-bg {
+  position: relative;
+  background-color: var(--bg-page-fallback);
+  background-image: var(--bg-hero-gradient);
+  isolation: isolate;
+}
+.px-page-bg::before,
+.px-page-bg::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+}
+.px-page-bg::before {
+  background: var(--bg-vignette);
+  z-index: 0;
+}
+.px-page-bg::after {
+  background-image: var(--bg-grain-url);
+  background-size: var(--bg-grain-tile) var(--bg-grain-tile);
+  background-repeat: repeat;
+  opacity: var(--bg-grain-alpha);
+  mix-blend-mode: var(--bg-grain-blend);
+  z-index: 1;
+}
+.px-page-bg > * { position: relative; z-index: 2; }
+
+/* Self-contained variant for embedded surfaces (cards, frames, slides)
+   where `position: fixed` would escape the surface bounds. Same recipe,
+   just absolute layers contained to the element. */
+.px-surface-bg {
+  position: relative;
+  background-color: var(--bg-page-fallback);
+  background-image: var(--bg-hero-gradient);
+  isolation: isolate;
+  overflow: hidden;
+}
+.px-surface-bg::before,
+.px-surface-bg::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+}
+.px-surface-bg::before { background: var(--bg-vignette); z-index: 0; }
+.px-surface-bg::after  {
+  background-image: var(--bg-grain-url);
+  background-size: var(--bg-grain-tile) var(--bg-grain-tile);
+  background-repeat: repeat;
+  opacity: var(--bg-grain-alpha);
+  mix-blend-mode: var(--bg-grain-blend);
+  z-index: 1;
+}
+.px-surface-bg > * { position: relative; z-index: 2; }
+
+.ds-display, .ds-h1, .ds-h2, .ds-h3 {
+  font-family: var(--font-display);
+  color: var(--fg-1);
+  font-weight: 400;        /* Instrument Serif sits at 400  */
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-snug);
+  margin: 0;
+}
+
+.ds-display { font-size: var(--fs-display); line-height: var(--lh-tight); }
+.ds-h1      { font-size: var(--fs-h1); }
+.ds-h2      { font-size: var(--fs-h2); }
+.ds-h3      { font-size: var(--fs-h3); letter-spacing: var(--tracking-tight); }
+
+.ds-h4 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-h4);
+  font-weight: 600;
+  line-height: 1.30;
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+  margin: 0;
+}
+
+.ds-eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--fg-4);
+  margin: 0;
+}
+
+.ds-body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-loose);
+  color: var(--fg-2);
+  font-weight: 400;
+  margin: 0;
+}
+
+.ds-body-lg {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-loose);
+  color: var(--fg-3);
+  font-weight: 300;
+  margin: 0;
+}
+
+.ds-label {
+  font-family: var(--font-sans);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  color: var(--fg-2);
+}
+
+.ds-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-2);
+}
