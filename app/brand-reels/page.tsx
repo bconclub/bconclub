@@ -74,13 +74,18 @@ const reels = [
   { src: 'scan2kare', tag: 'Healthcare' },
   { src: 'parachute', tag: 'FMCG' },
   { src: 'wowbus', tag: 'Travel' },
-  { src: 'lokazen', tag: 'Mobility' },
+  { src: 'lokazen', tag: 'Real estate' },
   { src: 'proxe', tag: 'AI SaaS' },
   { src: 'comet', tag: 'Footwear' },
 ];
 
-/* ── BCON-branded 15s teasers (with sound) in /public/brand-reels ── */
-const teasers = ['tick', 'countdown', 'wall', 'brief'];
+/* ── Finished client reels, full length with original audio, in /public/brand-reels ── */
+const work = [
+  { id: 'scan2kare', len: '1 min reel', price: '₹10,000', tag: 'Healthcare' },
+  { id: 'lokazen', len: '1 min reel', price: '₹10,000', tag: 'Real estate' },
+  { id: 'proxe-health', len: '30s reel', price: '₹5,000', tag: 'AI SaaS · Healthcare' },
+  { id: 'proxe-realestate', len: '30s reel', price: '₹5,000', tag: 'AI SaaS · Real estate' },
+];
 
 const tiers = [
   { len: '30s', name: 'The Story', price: '₹5,000', per: 'per reel', use: 'Feed ads, Reels and launches. Problem, product, payoff, cut to the beat.' },
@@ -200,7 +205,7 @@ export default function BrandReelsPage() {
       }
     });
     if (next && typeof window !== 'undefined' && (window as any).dataLayer) {
-      (window as any).dataLayer.push({ event: 'teaser_sound_on', page: 'brand-reels', teaser: next });
+      (window as any).dataLayer.push({ event: 'reel_sound_on', page: 'brand-reels', teaser: next });
     }
   };
 
@@ -328,10 +333,10 @@ export default function BrandReelsPage() {
           <span>30s · ₹5K</span><span>60s · ₹10K</span><span>Custom</span>
         </div>
 
-        <p className="bbr-sound-hint"><IconSoundOn /> Tap any reel to hear the voiceover</p>
+        <p className="bbr-sound-hint"><IconSoundOn /> Real reels we&apos;ve made. Tap any one for sound</p>
 
         <div className="bbr-teasers" ref={teaserRef}>
-          {teasers.map((t, i) => (
+          {work.map(({ id: t, len, price, tag }, i) => (
             <figure
               className={`bbr-teaser ${soundOn === t ? 'bbr-teaser-live' : ''}`}
               key={t}
@@ -341,8 +346,8 @@ export default function BrandReelsPage() {
             >
               <video
                 data-id={t}
-                src={`/brand-reels/teaser-${t}.mp4`}
-                poster={`/brand-reels/teaser-${t}.jpg`}
+                src={`/brand-reels/work-${t}.mp4`}
+                poster={`/brand-reels/work-${t}.jpg`}
                 muted
                 loop
                 playsInline
@@ -351,11 +356,15 @@ export default function BrandReelsPage() {
               <button
                 className={`bbr-sound ${soundOn === t ? 'bbr-sound-on' : ''}`}
                 onClick={(e) => { e.stopPropagation(); toggleSound(t); }}
-                aria-label={soundOn === t ? 'Mute teaser' : 'Play teaser with sound'}
+                aria-label={soundOn === t ? `Mute ${tag} reel` : `Play ${tag} reel with sound`}
               >
                 {soundOn === t ? <IconSoundOn /> : <IconSoundOff />}
                 <span>{soundOn === t ? 'Sound on' : 'Tap for sound'}</span>
               </button>
+              <figcaption className="bbr-teaser-meta">
+                <span className="bbr-teaser-len">{len} · {price}</span>
+                <span className="bbr-teaser-tag">{tag}</span>
+              </figcaption>
             </figure>
           ))}
         </div>
