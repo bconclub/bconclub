@@ -89,15 +89,23 @@ const tiers = [
 ];
 
 const lengthOptions = [
-  { value: '30s', label: '30 seconds (₹5,000)' },
-  { value: '60s', label: '60 seconds (₹10,000)' },
-  { value: 'Custom', label: 'Custom (quoted by length)' },
+  { value: '30s', label: '30 second reel', price: '₹5,000' },
+  { value: '60s', label: '60 second reel', price: '₹10,000' },
+  { value: 'Custom', label: 'Custom length', price: 'Quoted by length' },
+];
+
+// What every reel order includes, whatever the length
+const includes = [
+  'A complete script',
+  'A visual board: frame-by-frame storyboard of your reel',
+  'Review + changes: you see the board, request changes, we revise before generating',
+  'Final reel, vertical, with music + captions',
 ];
 
 const faqs = [
   {
     q: 'How much does a reel cost?',
-    a: 'A 30 second reel is ₹5,000. A 60 second reel is ₹10,000. Anything longer, or a batch of reels, is quoted by length.'
+    a: 'A 30 second reel is ₹5,000. A 60 second reel is ₹10,000. Anything longer, or a batch of reels, is quoted by length. Every order includes the script, the visual board, a round of changes and the final reel with music and captions.'
   },
   {
     q: 'Is this real footage or AI?',
@@ -116,8 +124,8 @@ const faqs = [
     a: 'Anywhere vertical video runs: Instagram Reels, Meta Ads, YouTube Shorts, WhatsApp status, your website. We deliver 9:16 by default and can recut for 1:1 and 16:9.'
   },
   {
-    q: 'How many revisions do I get?',
-    a: 'We share a concept and a first cut before anything is final, so you shape it early. Changes are tightened together on a call, not over endless email threads.'
+    q: 'Do I get to make changes?',
+    a: 'Yes, before anything is generated. You get the complete script and a frame-by-frame visual board first. You request changes, we revise, and only then do we generate and cut the reel.'
   },
   {
     q: 'Can you run the reels as ads too?',
@@ -242,7 +250,7 @@ export default function BrandReelsPage() {
     const phoneDigits = formData.phone.replace(/\D/g, '');
     if (phoneDigits.length < 10) newErrors.phone = 'Valid phone number is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Valid email is required';
-    if (!formData.videoLength) newErrors.videoLength = 'Pick a video length';
+    if (!formData.videoLength) newErrors.videoLength = 'Pick your reel';
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
@@ -301,12 +309,12 @@ export default function BrandReelsPage() {
 
         <h1 className="bbr-hero-headline">
           <span className="bbr-h-brand">BCON <span className="bbr-accent">Brand Reels</span></span>
-          <span className="bbr-h-line">You bring the brief.<br />We bring the film.</span>
+          <span className="bbr-h-line">Get your reels done starting from ₹5K.</span>
         </h1>
 
         <p className="bbr-hero-sub">
-          Scroll-stopping brand reels generated with AI and cut by hand.
-          No shoot, no crew, no studio. Just a film that looks like your brand spent a fortune on it.
+          Scroll-stopping brand reels generated with AI and cut by hand. You get the script,
+          a frame-by-frame visual board to approve, and a finished vertical reel. No shoot, no crew, no studio.
         </p>
 
         <div className="bbr-hero-ctas">
@@ -411,7 +419,7 @@ export default function BrandReelsPage() {
       <section className="bbr-section" id="pricing">
         <div className="bbr-container">
           <div className="bbr-section-label">Pricing</div>
-          <h2 className="bbr-section-heading">Choose your cut. <span className="bbr-accent">Every second earns its place.</span></h2>
+          <h2 className="bbr-section-heading">Choose your reel. <span className="bbr-accent">Everything included.</span></h2>
           <div className="bbr-grid bbr-grid-3">
             {tiers.map((c) => (
               <div className="bbr-cut" key={c.len} data-reveal>
@@ -419,6 +427,11 @@ export default function BrandReelsPage() {
                 <h3>{c.name}</h3>
                 <div className="bbr-price">{c.price} <span>{c.per}</span></div>
                 <p>{c.use}</p>
+                <ul className="bbr-includes">
+                  {includes.map((item) => (
+                    <li key={item}><IconCheck /> {item}</li>
+                  ))}
+                </ul>
                 <button
                   className="bbr-cut-btn"
                   onClick={() => { setFormData((f) => ({ ...f, videoLength: c.len })); scrollToForm(); }}
@@ -435,28 +448,21 @@ export default function BrandReelsPage() {
       <section className="bbr-section">
         <div className="bbr-container">
           <div className="bbr-section-label">How it works</div>
-          <h2 className="bbr-section-heading">Brief to film in <span className="bbr-accent">days, not weeks.</span></h2>
+          <h2 className="bbr-section-heading">Pick it. Brief it. <span className="bbr-accent">Approve it. Done.</span></h2>
           <ol className="bbr-steps">
-            <li data-reveal>
-              <span className="bbr-step-num">01</span>
-              <div><h3>Brief</h3><p>Tell us what you sell, who it is for and what you want them to do. Send product photos and your logo.</p></div>
-            </li>
-            <li data-reveal>
-              <span className="bbr-step-num">02</span>
-              <div><h3>Concept</h3><p>We write the idea, the hook and a shot list. You approve the direction before anything is generated.</p></div>
-            </li>
-            <li data-reveal>
-              <span className="bbr-step-num">03</span>
-              <div><h3>Generate</h3><p>Our AI pipeline builds every scene, frame-locked to your brand and product.</p></div>
-            </li>
-            <li data-reveal>
-              <span className="bbr-step-num">04</span>
-              <div><h3>Cut</h3><p>Editors cut, score, caption and finish it. You review the first cut and we tighten it together.</p></div>
-            </li>
-            <li data-reveal>
-              <span className="bbr-step-num">05</span>
-              <div><h3>Deliver</h3><p>Final files in every format you need, ready to post or run as ads.</p></div>
-            </li>
+            {[
+              { h: 'Pick your reel', p: 'Choose 30s, 60s or a custom length.' },
+              { h: 'Share your brief', p: 'What you sell, who it is for and what you want them to do. Add product photos and your logo.' },
+              { h: 'Script + visual board', p: 'We send the complete script and a frame-by-frame visual board of your reel.' },
+              { h: 'Review + changes', p: 'You review the board and request changes. We revise before anything is generated.' },
+              { h: 'Generate + cut', p: 'Our AI pipeline builds every scene, then editors cut, score and caption it.' },
+              { h: 'Delivered', p: 'Your final vertical reel, with music and captions, ready to post or run as ads.' },
+            ].map((step, i) => (
+              <li data-reveal key={step.h}>
+                <span className="bbr-step-num">{String(i + 1).padStart(2, '0')}</span>
+                <div><h3>{step.h}</h3><p>{step.p}</p></div>
+              </li>
+            ))}
           </ol>
         </div>
       </section>
@@ -497,9 +503,34 @@ export default function BrandReelsPage() {
           <div className="bbr-form-copy">
             <div className="bbr-section-label">Start your reel</div>
             <h2 className="bbr-section-heading">Tell us your brand.<br /><span className="bbr-accent">We&apos;ll pitch the film.</span></h2>
-            <p>We&apos;ll come back with a concept for your first reel. 30s for ₹5,000, 60s for ₹10,000, longer cuts quoted by length. No commitment until you like the idea.</p>
+            <p>Pick your reel and tell us about your brand. We&apos;ll come back with the complete script and visual board for you to review before anything is generated.</p>
+            <ul className="bbr-includes bbr-includes-form">
+              {includes.map((item) => (
+                <li key={item}><IconCheck /> {item}</li>
+              ))}
+            </ul>
           </div>
           <form className="bbr-form" onSubmit={handleSubmit} noValidate>
+            <fieldset className="bbr-reel-pick">
+              <legend>Pick your reel</legend>
+              {lengthOptions.map((o) => (
+                <label
+                  key={o.value}
+                  className={`bbr-reel-option ${formData.videoLength === o.value ? 'bbr-reel-option-on' : ''} ${errors.videoLength ? 'bbr-input-error' : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="videoLength"
+                    value={o.value}
+                    checked={formData.videoLength === o.value}
+                    onChange={handleChange}
+                  />
+                  <span className="bbr-reel-option-label">{o.label}</span>
+                  <span className="bbr-reel-option-price">{o.price}</span>
+                </label>
+              ))}
+              {errors.videoLength && <em className="bbr-error">{errors.videoLength}</em>}
+            </fieldset>
             {([
               { name: 'name', label: 'Your name', type: 'text', placeholder: 'Full name' },
               { name: 'brand', label: 'Brand name', type: 'text', placeholder: 'What is your brand called?' },
@@ -519,21 +550,6 @@ export default function BrandReelsPage() {
                 {errors[f.name] && <em className="bbr-error">{errors[f.name]}</em>}
               </label>
             ))}
-            <label className="bbr-field">
-              <span>Video length</span>
-              <select
-                name="videoLength"
-                value={formData.videoLength}
-                onChange={handleChange}
-                className={errors.videoLength ? 'bbr-input-error' : ''}
-              >
-                <option value="" disabled>Pick a length</option>
-                {lengthOptions.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              {errors.videoLength && <em className="bbr-error">{errors.videoLength}</em>}
-            </label>
             <button type="submit" className="bbr-cta-btn bbr-submit" disabled={submitting}>
               {submitting ? 'Sending...' : <>Get My Reel Concept <ArrowRight className="bbr-cta-arrow" /></>}
             </button>
@@ -563,7 +579,7 @@ export default function BrandReelsPage() {
       {/* ── FINAL CTA ────────────────────────────────────────── */}
       <section className="bbr-section bbr-final">
         <div className="bbr-container">
-          <h2 className="bbr-final-heading">Your brand deserves a film.<br /><span className="bbr-accent">Not a slideshow.</span></h2>
+          <h2 className="bbr-final-heading">Get your reels done<br /><span className="bbr-accent">starting from ₹5K.</span></h2>
           <button className="bbr-cta-btn bbr-cta-large" onClick={scrollToForm}>
             Get Your First Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
