@@ -328,9 +328,17 @@ export default function BrandReelsPage() {
           <span>30s · ₹5K</span><span>60s · ₹10K</span><span>Custom</span>
         </div>
 
+        <p className="bbr-sound-hint"><IconSoundOn /> Tap any reel to hear the voiceover</p>
+
         <div className="bbr-teasers" ref={teaserRef}>
           {teasers.map((t, i) => (
-            <figure className="bbr-teaser" key={t} data-reveal style={{ transitionDelay: `${i * 90}ms` }}>
+            <figure
+              className={`bbr-teaser ${soundOn === t ? 'bbr-teaser-live' : ''}`}
+              key={t}
+              data-reveal
+              style={{ transitionDelay: `${i * 90}ms` }}
+              onClick={() => toggleSound(t)}
+            >
               <video
                 data-id={t}
                 src={`/brand-reels/teaser-${t}.mp4`}
@@ -342,10 +350,11 @@ export default function BrandReelsPage() {
               />
               <button
                 className={`bbr-sound ${soundOn === t ? 'bbr-sound-on' : ''}`}
-                onClick={() => toggleSound(t)}
+                onClick={(e) => { e.stopPropagation(); toggleSound(t); }}
                 aria-label={soundOn === t ? 'Mute teaser' : 'Play teaser with sound'}
               >
                 {soundOn === t ? <IconSoundOn /> : <IconSoundOff />}
+                <span>{soundOn === t ? 'Sound on' : 'Tap for sound'}</span>
               </button>
             </figure>
           ))}
