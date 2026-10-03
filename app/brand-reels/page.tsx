@@ -313,8 +313,8 @@ export default function BrandReelsPage() {
         <div className="bbr-hero-badge"><span className="bbr-rec" /> BCON BRAND REELS</div>
 
         <h1 className="bbr-hero-headline">
-          <span className="bbr-h-top"><span>Your brand.</span> <span>Your story.</span></span>
-          <span className="bbr-h-bottom">Told at the <span className="bbr-h-price">speed of AI.</span></span>
+          <span className="bbr-h-top"><span>Your story,</span></span>
+          <span className="bbr-h-bottom">told at the <span className="bbr-h-price">speed of AI.</span></span>
         </h1>
 
         <p className="bbr-hero-sub">
