@@ -81,10 +81,10 @@ const reels = [
 
 /* ── Finished client reels, full length with original audio, in /public/brand-reels ── */
 const work = [
-  { id: 'scan2kare', len: '1 min reel', price: '₹10,000', tag: 'Healthcare' },
-  { id: 'lokazen', len: '1 min reel', price: '₹10,000', tag: 'Real estate' },
-  { id: 'proxe-health', len: '30s reel', price: '₹5,000', tag: 'AI SaaS · Healthcare' },
-  { id: 'proxe-realestate', len: '30s reel', price: '₹5,000', tag: 'AI SaaS · Real estate' },
+  { id: 'scan2kare', len: '1 min reel', tag: 'Healthcare' },
+  { id: 'lokazen', len: '1 min reel', tag: 'Real estate' },
+  { id: 'proxe-health', len: '30s reel', tag: 'AI SaaS · Healthcare' },
+  { id: 'proxe-realestate', len: '30s reel', tag: 'AI SaaS · Real estate' },
 ];
 
 const tiers = [
@@ -310,33 +310,42 @@ export default function BrandReelsPage() {
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="bbr-hero">
-        <div className="bbr-hero-badge"><span className="bbr-rec" /> NEW FROM BCON</div>
+        <div className="bbr-hero-badge"><span className="bbr-rec" /> BCON BRAND REELS</div>
 
         <h1 className="bbr-hero-headline">
-          <span className="bbr-h-brand">BCON <span className="bbr-accent">Brand Reels</span></span>
-          <span className="bbr-h-line">Get your reels done starting from ₹5K.</span>
+          <span className="bbr-h-top"><span>Your brand.</span> <span>Your story.</span></span>
+          <span className="bbr-h-bottom">Told at the <span className="bbr-h-price">speed of AI.</span></span>
         </h1>
 
         <p className="bbr-hero-sub">
-          Scroll-stopping brand reels generated with AI and cut by hand. You get the script,
-          a frame-by-frame visual board to approve, and a finished vertical reel. No shoot, no crew, no studio.
+          You bring the brief. We write the script, board it frame by frame and cut the film.
+          <strong> Made with AI, directed by people</strong>, and you sign off on every shot before it&apos;s made.
         </p>
+
+        <ul className="bbr-hero-includes" aria-label="Every reel includes">
+          <li><span>01</span> Script</li>
+          <li><span>02</span> Visual board</li>
+          <li><span>03</span> Your changes</li>
+          <li><span>04</span> Final reel</li>
+        </ul>
 
         <div className="bbr-hero-ctas">
           <button className="bbr-cta-btn" onClick={scrollToForm}>
-            Get Your First Reel <ArrowRight className="bbr-cta-arrow" />
+            Start My Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
-          <a className="bbr-ghost-btn" href="#reels">Watch the reels</a>
+          <a className="bbr-ghost-btn" href="#reels">See our reels</a>
         </div>
 
-        <div className="bbr-cut-pills" aria-label="Available lengths">
-          <span>30s · ₹5K</span><span>60s · ₹10K</span><span>Custom</span>
-        </div>
+        <p className="bbr-hero-proof">
+          <b>No shoot.</b> <b>No crew.</b> <b>No studio.</b>
+          <span className="bbr-hero-proof-sep" />
+          Every kind of brand, one studio.
+        </p>
 
         <p className="bbr-sound-hint"><IconSoundOn /> Real reels we&apos;ve made. Tap any one for sound</p>
 
         <div className="bbr-teasers" ref={teaserRef}>
-          {work.map(({ id: t, len, price, tag }, i) => (
+          {work.map(({ id: t, len, tag }, i) => (
             <figure
               className={`bbr-teaser ${soundOn === t ? 'bbr-teaser-live' : ''}`}
               key={t}
@@ -362,7 +371,7 @@ export default function BrandReelsPage() {
                 <span>{soundOn === t ? 'Sound on' : 'Tap for sound'}</span>
               </button>
               <figcaption className="bbr-teaser-meta">
-                <span className="bbr-teaser-len">{len} · {price}</span>
+                <span className="bbr-teaser-len">{len}</span>
                 <span className="bbr-teaser-tag">{tag}</span>
               </figcaption>
             </figure>
@@ -433,35 +442,6 @@ export default function BrandReelsPage() {
         </div>
       </section>
 
-      {/* ── CHOOSE YOUR CUT ──────────────────────────────────── */}
-      <section className="bbr-section" id="pricing">
-        <div className="bbr-container">
-          <div className="bbr-section-label">Pricing</div>
-          <h2 className="bbr-section-heading">Choose your reel. <span className="bbr-accent">Everything included.</span></h2>
-          <div className="bbr-grid bbr-grid-3">
-            {tiers.map((c) => (
-              <div className="bbr-cut" key={c.len} data-reveal>
-                <div className="bbr-cut-len">{c.len}</div>
-                <h3>{c.name}</h3>
-                <div className="bbr-price">{c.price} <span>{c.per}</span></div>
-                <p>{c.use}</p>
-                <ul className="bbr-includes">
-                  {includes.map((item) => (
-                    <li key={item}><IconCheck /> {item}</li>
-                  ))}
-                </ul>
-                <button
-                  className="bbr-cut-btn"
-                  onClick={() => { setFormData((f) => ({ ...f, videoLength: c.len })); scrollToForm(); }}
-                >
-                  Choose {c.len} <ArrowRight className="bbr-cta-arrow" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── HOW IT WORKS ─────────────────────────────────────── */}
       <section className="bbr-section">
         <div className="bbr-container">
@@ -511,6 +491,35 @@ export default function BrandReelsPage() {
                 <li><IconCheck /> Multiple cuts to test and scale</li>
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CHOOSE YOUR CUT ──────────────────────────────────── */}
+      <section className="bbr-section" id="pricing">
+        <div className="bbr-container">
+          <div className="bbr-section-label">Pricing</div>
+          <h2 className="bbr-section-heading">Choose your reel. <span className="bbr-accent">Everything included.</span></h2>
+          <div className="bbr-grid bbr-grid-3">
+            {tiers.map((c) => (
+              <div className="bbr-cut" key={c.len} data-reveal>
+                <div className="bbr-cut-len">{c.len}</div>
+                <h3>{c.name}</h3>
+                <div className="bbr-price">{c.price} <span>{c.per}</span></div>
+                <p>{c.use}</p>
+                <ul className="bbr-includes">
+                  {includes.map((item) => (
+                    <li key={item}><IconCheck /> {item}</li>
+                  ))}
+                </ul>
+                <button
+                  className="bbr-cut-btn"
+                  onClick={() => { setFormData((f) => ({ ...f, videoLength: c.len })); scrollToForm(); }}
+                >
+                  Choose {c.len} <ArrowRight className="bbr-cta-arrow" />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </section>
