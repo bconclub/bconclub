@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { getMergedUTMParams } from '@/lib/tracking/utm';
+import { WhatsAppIcon } from '@/components/shared/Icons';
 import './page.css';
 
 /* ── Vector icons (no emoji) ─────────────────────────────────── */
@@ -68,6 +69,20 @@ const IconSoundOn = () => (
   </svg>
 );
 
+const IconClock = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" /><polyline points="12 7 12 12 15.5 14" />
+  </svg>
+);
+
+const IconClose = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+    <line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" />
+  </svg>
+);
+
+const WHATSAPP_URL = 'https://wa.me/6360079756?text=Hi%2C%20I%20want%20to%20know%20more%20about%20BCON%20Brand%20Reels.';
+
 /* ── Reel wall: short, muted, web-encoded loops in /public/brand-reels ── */
 const reels = [
   { src: 'campa-cola', tag: 'Beverage' },
@@ -79,7 +94,7 @@ const reels = [
   { src: 'comet', tag: 'Footwear' },
 ];
 
-/* ── Finished client reels, full length with original audio, in /public/brand-reels ── */
+/* ── Finished client reels, full length with original audio ── */
 const work = [
   { id: 'scan2kare', len: '1 min reel', tag: 'Healthcare' },
   { id: 'lokazen', len: '1 min reel', tag: 'Real estate' },
@@ -87,10 +102,46 @@ const work = [
   { id: 'proxe-realestate', len: '30s reel', tag: 'AI SaaS · Real estate' },
 ];
 
+// The workflow every reel follows (hero timeline)
+const flow = [
+  { h: 'Script', p: 'Written for your brand' },
+  { h: 'Visual board', p: 'Every frame planned' },
+  { h: 'Review', p: 'Up to 3 changes' },
+  { h: 'Final reel', p: 'Music + captions' },
+];
+
+// Languages we make reels in, shown in their own scripts
+const languages = [
+  { native: 'ಕನ್ನಡ', name: 'Kannada' },
+  { native: 'தமிழ்', name: 'Tamil' },
+  { native: 'తెలుగు', name: 'Telugu' },
+  { native: 'മലയാളം', name: 'Malayalam' },
+  { native: 'हिन्दी', name: 'Hindi' },
+  { native: 'मराठी', name: 'Marathi' },
+  { native: 'বাংলা', name: 'Bengali' },
+  { native: 'ગુજરાતી', name: 'Gujarati' },
+  { native: 'ਪੰਜਾਬੀ', name: 'Punjabi' },
+  { native: 'ଓଡ଼ିଆ', name: 'Odia' },
+  { native: 'ತುಳು', name: 'Tulu' },
+  { native: 'कोंकणी', name: 'Konkani' },
+  { native: 'भोजपुरी', name: 'Bhojpuri' },
+  { native: 'English', name: 'English' },
+];
+
+// What you get: shown as an auto-scrolling carousel
+const features = [
+  { icon: <IconSpark />, h: 'Brand-locked visuals', p: 'Your product, logo, colours and tone, held consistent in every frame.' },
+  { icon: <IconScissors />, h: 'Edited to the second', p: 'Real editors cut every reel to the beat, with the hook in the first second.' },
+  { icon: <IconMusic />, h: 'Music, captions, sound', p: 'Scored, captioned and mixed so it lands with the sound on or off.' },
+  { icon: <IconPhone />, h: 'Made for vertical', p: 'Built for Instagram Reels, Meta Ads, YouTube Shorts and WhatsApp status.' },
+  { icon: <IconLayers />, h: 'Variations to test', p: 'Swap hooks, music and CTAs so your ads have more than one cut to test.' },
+  { icon: <IconFilm />, h: 'Any kind of brand', p: 'Beverage, healthcare, FMCG, travel, tech. If you can describe it, we can film it.' },
+];
+
 const tiers = [
-  { len: '30s', name: 'The Story', price: '₹5,000', per: 'per reel', use: 'Feed ads, Reels and launches. Problem, product, payoff, cut to the beat.' },
-  { len: '60s', name: 'The Film', price: '₹10,000', per: 'per reel', use: 'Brand films, YouTube and website heroes. The full world of your brand.' },
-  { len: 'Custom', name: 'Your Cut', price: 'Quoted', per: 'by length', use: 'Longer films, a series or a batch of cuts. Priced on the length you need.' },
+  { len: '30s', name: 'The Story', price: '₹5,000', per: 'per reel', speed: '4 hours', use: 'Feed ads, Reels and launches. Problem, product, payoff, cut to the beat.' },
+  { len: '60s', name: 'The Film', price: '₹10,000', per: 'per reel', speed: '8 hours', use: 'Brand films, YouTube and website heroes. The full world of your brand.' },
+  { len: 'Custom', name: 'Your Cut', price: 'Quoted', per: 'by length', speed: '', use: 'Longer films, a series or a batch of cuts. Priced on the length you need.' },
 ];
 
 const lengthOptions = [
@@ -103,38 +154,41 @@ const lengthOptions = [
 const includes = [
   'A complete script',
   'A visual board: frame-by-frame storyboard of your reel',
-  'Review + changes: you see the board, request changes, we revise before generating',
+  'Review: up to 3 changes on the board before we generate',
   'Final reel, vertical, with music + captions',
+];
+
+const inHouse = [
+  { n: '01', h: 'Script', p: 'Written by our team around your brief.' },
+  { n: '02', h: 'Visual board', p: 'Every frame planned before it is made.' },
+  { n: '03', h: 'AI generation', p: 'Run on our own pipeline, locked to your brand.' },
+  { n: '04', h: 'Edit + sound', p: 'Cut, scored and captioned by our editors.' },
 ];
 
 const faqs = [
   {
     q: 'How much does a reel cost?',
-    a: 'A 30 second reel is ₹5,000. A 60 second reel is ₹10,000. Anything longer, or a batch of reels, is quoted by length. Every order includes the script, the visual board, a round of changes and the final reel with music and captions.'
+    a: 'A 30 second reel is ₹5,000. A 60 second reel is ₹10,000. Anything longer, or a batch of reels, is quoted by length. Every order includes the script, the visual board, up to 3 changes and the final reel with music and captions.'
+  },
+  {
+    q: 'How fast do I get my reel?',
+    a: 'Once your script is final, a 30 second reel is delivered in 4 hours and a 60 second reel in 8 hours. Our average delivery time is under 8 hours.'
+  },
+  {
+    q: 'Which languages do you make reels in?',
+    a: 'Kannada, Tamil, Telugu, Malayalam, Hindi, Marathi, Bengali, Gujarati, Punjabi, Odia, Tulu, Konkani, Bhojpuri, English and more. Tell us the language your customers speak.'
   },
   {
     q: 'Is this real footage or AI?',
     a: 'AI. Every frame is generated, then directed, edited, scored and finished by our team. No shoot day, no crew, no studio rental, no location permits.'
   },
   {
+    q: 'Do I get to make changes?',
+    a: 'Yes, before anything is generated. You get the complete script and a frame-by-frame visual board first, and you can ask for up to 3 changes. Only then do we generate and cut the reel.'
+  },
+  {
     q: 'Will it look like my brand?',
     a: 'Yes. We lock your product, logo, colours and tone before a single frame is generated. Your actual product shots are used as reference so packaging and labels stay accurate.'
-  },
-  {
-    q: 'What do I need to send?',
-    a: 'A brief: what you sell, who it is for, and the one thing you want people to feel or do. Product photos and your logo help. That is it.'
-  },
-  {
-    q: 'Where can I use the reels?',
-    a: 'Anywhere vertical video runs: Instagram Reels, Meta Ads, YouTube Shorts, WhatsApp status, your website. We deliver 9:16 by default and can recut for 1:1 and 16:9.'
-  },
-  {
-    q: 'Do I get to make changes?',
-    a: 'Yes, before anything is generated. You get the complete script and a frame-by-frame visual board first. You request changes, we revise, and only then do we generate and cut the reel.'
-  },
-  {
-    q: 'Can you run the reels as ads too?',
-    a: 'Yes. Pair Brand Reels with our AI Lead Machine and we run the campaigns and follow up every lead for you.'
   },
 ];
 
@@ -146,6 +200,43 @@ interface FormData {
   videoLength: string;
 }
 
+const pushEvent = (data: Record<string, unknown>) => {
+  if (typeof window !== 'undefined' && (window as any).dataLayer) (window as any).dataLayer.push(data);
+};
+
+const submitToPROXe = async (data: FormData, source: string) => {
+  try {
+    const utm = getMergedUTMParams();
+    const res = await fetch('https://proxe.bconclub.com/api/website', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: data.name,
+        email: data.email,
+        phone: data.phone || '',
+        message: `Brand Reels inquiry (${source}) - Brand: ${data.brand || 'n/a'} - Video length: ${data.videoLength}`,
+        form_type: 'contact',
+        page_url: window.location.href,
+        // PROXe requires a non-empty brand or it rejects the lead with 400.
+        brand: data.brand?.trim() || data.name?.trim() || 'Brand Reels Lead',
+        service: 'brand-reels',
+        video_length: data.videoLength,
+        utm_source: utm.utm_source || '',
+        utm_medium: utm.utm_medium || '',
+        utm_campaign: utm.utm_campaign || '',
+        utm_term: utm.utm_term || '',
+        utm_content: utm.utm_content || '',
+      }),
+    });
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '');
+      console.error(`PROXe submission rejected (HTTP ${res.status}):`, errBody);
+    }
+  } catch (e) {
+    console.error('PROXe submission failed:', e);
+  }
+};
+
 export default function BrandReelsPage() {
   const [formData, setFormData] = useState<FormData>({ name: '', brand: '', phone: '', email: '', videoLength: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -155,25 +246,33 @@ export default function BrandReelsPage() {
   const teaserRef = useRef<HTMLDivElement>(null);
   const [soundOn, setSoundOn] = useState<string | null>(null);
 
-  // Reveal [data-reveal] elements as they enter view
+  // Quick popup form (name + phone + length) opened from every CTA
+  const [modalOpen, setModalOpen] = useState(false);
+  const [quick, setQuick] = useState({ name: '', phone: '', videoLength: '' });
+  const [quickErr, setQuickErr] = useState('');
+  const [quickDone, setQuickDone] = useState(false);
+  const quickNameRef = useRef<HTMLInputElement>(null);
+
+  // Reveal [data-reveal] elements as they enter view. Uses a data attribute,
+  // not a class, so React re-renders of className never undo the reveal.
   useEffect(() => {
     const els = document.querySelectorAll('[data-reveal]');
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            e.target.classList.add('bbr-in');
+            e.target.setAttribute('data-in', '');
             obs.unobserve(e.target);
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
     els.forEach((el) => obs.observe(el));
     return () => obs.disconnect();
   }, []);
 
-  // Only play reel loops while they are on screen (saves battery + data)
+  // Only play reels while they are on screen (saves battery + data)
   useEffect(() => {
     const vids = [
       ...(teaserRef.current?.querySelectorAll('video') ?? []),
@@ -193,7 +292,22 @@ export default function BrandReelsPage() {
     return () => obs.disconnect();
   }, []);
 
-  // One teaser plays with sound at a time; the rest stay muted
+  // Modal: lock page scroll, close on Escape, focus the first field
+  useEffect(() => {
+    if (!modalOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setModalOpen(false); };
+    window.addEventListener('keydown', onKey);
+    const t = window.setTimeout(() => quickNameRef.current?.focus(), 60);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+      window.clearTimeout(t);
+    };
+  }, [modalOpen]);
+
+  // One reel plays with sound at a time; the rest stay muted
   const toggleSound = (id: string) => {
     const next = soundOn === id ? null : id;
     setSoundOn(next);
@@ -204,47 +318,47 @@ export default function BrandReelsPage() {
         v.play().catch(() => {});
       }
     });
-    if (next && typeof window !== 'undefined' && (window as any).dataLayer) {
-      (window as any).dataLayer.push({ event: 'reel_sound_on', page: 'brand-reels', teaser: next });
+    if (next) pushEvent({ event: 'reel_sound_on', page: 'brand-reels', reel: next });
+  };
+
+  const openModal = (videoLength = '', source = 'cta') => {
+    setQuick((q) => ({ ...q, videoLength: videoLength || q.videoLength }));
+    setQuickErr('');
+    setModalOpen(true);
+    pushEvent({ event: 'brand_reels_modal_open', source });
+  };
+
+  const handleQuickSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quick.name.trim()) { setQuickErr('Please enter your name'); return; }
+    const digits = quick.phone.replace(/\D/g, '').slice(-10);
+    if (digits.length !== 10) { setQuickErr('Please enter a valid 10 digit phone number'); return; }
+    if (!quick.videoLength) { setQuickErr('Pick a reel length'); return; }
+    setQuickErr('');
+    const phone = `+91${digits}`;
+
+    pushEvent({ event: 'web_lead', formType: 'Brand Reels Quick', service: 'brand-reels', videoLength: quick.videoLength });
+    // Inline success (no /thank-you redirect), so fire the Meta Lead event here.
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Lead', { content_name: 'Brand Reels Quick' });
     }
+
+    submitToPROXe({ name: quick.name.trim(), brand: '', phone, email: '', videoLength: quick.videoLength }, 'popup');
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'lead',
+        data: { name: quick.name.trim(), phone, service: `BCON Brand Reels - ${quick.videoLength} (popup)` },
+      }),
+    }).catch((err) => console.error('Email notification failed:', err));
+
+    setQuickDone(true);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: '' });
-  };
-
-  const submitToPROXe = async (data: FormData) => {
-    try {
-      const utm = getMergedUTMParams();
-      const res = await fetch('https://proxe.bconclub.com/api/website', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          phone: data.phone || '',
-          message: `Brand Reels inquiry - Brand: ${data.brand} - Video length: ${data.videoLength}`,
-          form_type: 'contact',
-          page_url: window.location.href,
-          // PROXe requires a non-empty brand or it rejects the lead with 400.
-          brand: data.brand?.trim() || data.name?.trim() || 'Brand Reels Lead',
-          service: 'brand-reels',
-          video_length: data.videoLength,
-          utm_source: utm.utm_source || '',
-          utm_medium: utm.utm_medium || '',
-          utm_campaign: utm.utm_campaign || '',
-          utm_term: utm.utm_term || '',
-          utm_content: utm.utm_content || '',
-        }),
-      });
-      if (!res.ok) {
-        const errBody = await res.text().catch(() => '');
-        console.error(`PROXe submission rejected (HTTP ${res.status}):`, errBody);
-      }
-    } catch (e) {
-      console.error('PROXe submission failed:', e);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -260,18 +374,15 @@ export default function BrandReelsPage() {
     if (Object.keys(newErrors).length > 0) return;
 
     setSubmitting(true);
+    pushEvent({
+      event: 'web_lead',
+      formType: 'Brand Reels',
+      service: 'brand-reels',
+      brandName: formData.brand,
+      videoLength: formData.videoLength,
+    });
 
-    if (typeof window !== 'undefined' && (window as any).dataLayer) {
-      (window as any).dataLayer.push({
-        event: 'web_lead',
-        formType: 'Brand Reels',
-        service: 'brand-reels',
-        brandName: formData.brand,
-        videoLength: formData.videoLength,
-      });
-    }
-
-    submitToPROXe(formData);
+    submitToPROXe(formData, 'form');
 
     fetch('/api/send-email', {
       method: 'POST',
@@ -301,48 +412,70 @@ export default function BrandReelsPage() {
     }, 200);
   };
 
-  const scrollToForm = () => {
-    document.getElementById('reel-form')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const d = (ms: number) => ({ ['--d' as string]: `${ms}ms` }) as React.CSSProperties;
 
   return (
     <div className="bbr-page">
 
+      {/* ── HEADER ───────────────────────────────────────────── */}
+      <header className="bbr-header">
+        <div className="bbr-header-inner">
+          <a href="/" className="bbr-logo" aria-label="BCON Club home">
+            <img src="/BCON White logo.webp" alt="BCON" width={79} height={30} />
+            <span>Brand Reels</span>
+          </a>
+          <div className="bbr-header-actions">
+            <a
+              className="bbr-wa-btn"
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Chat with us on WhatsApp"
+              onClick={() => pushEvent({ event: 'whatsapp_click', source: 'brand_reels_header' })}
+            >
+              <WhatsAppIcon size={18} /> <span>WhatsApp</span>
+            </a>
+            <button className="bbr-header-cta" onClick={() => openModal('', 'header')}>Start my reel</button>
+          </div>
+        </div>
+      </header>
+
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="bbr-hero">
-        <div className="bbr-hero-badge"><span className="bbr-rec" /> BCON BRAND REELS</div>
+        <div className="bbr-hero-badge bbr-enter" style={d(0)}><span className="bbr-rec" /> BCON BRAND REELS</div>
 
         <h1 className="bbr-hero-headline">
-          <span className="bbr-h-top"><span>Your story,</span></span>
-          <span className="bbr-h-bottom">told at the <span className="bbr-h-price">speed of AI.</span></span>
+          <span className="bbr-h-top bbr-enter" style={d(100)}>Your story,</span>
+          <span className="bbr-h-bottom bbr-enter" style={d(220)}>told at the <span className="bbr-h-price">speed of AI.</span></span>
         </h1>
 
-        <p className="bbr-hero-sub">
+        <p className="bbr-hero-sub bbr-enter" style={d(380)}>
           You bring the brief. We write the script, board it frame by frame and cut the film.
           <strong> Made with AI, directed by people</strong>, and you sign off on every shot before it&apos;s made.
         </p>
 
-        <ul className="bbr-hero-includes" aria-label="Every reel includes">
-          <li><span>01</span> Script</li>
-          <li><span>02</span> Visual board</li>
-          <li><span>03</span> Your changes</li>
-          <li><span>04</span> Final reel</li>
-        </ul>
+        <ol className="bbr-flow" aria-label="How every reel is made">
+          {flow.map((f, i) => (
+            <li key={f.h} className="bbr-enter" style={d(500 + i * 90)}>
+              <span className="bbr-flow-dot">{String(i + 1).padStart(2, '0')}</span>
+              <span className="bbr-flow-h">{f.h}</span>
+              <span className="bbr-flow-p">{f.p}</span>
+            </li>
+          ))}
+        </ol>
 
-        <div className="bbr-hero-ctas">
-          <button className="bbr-cta-btn" onClick={scrollToForm}>
+        <div className="bbr-hero-ctas bbr-enter" style={d(860)}>
+          <button className="bbr-cta-btn" onClick={() => openModal('', 'hero')}>
             Start My Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
           <a className="bbr-ghost-btn" href="#reels">See our reels</a>
         </div>
 
-        <p className="bbr-hero-proof">
+        <p className="bbr-hero-proof bbr-enter" style={d(960)}>
           <b>No shoot.</b> <b>No crew.</b> <b>No studio.</b>
           <span className="bbr-hero-proof-sep" />
           Every kind of brand, one studio.
         </p>
-
-        <p className="bbr-sound-hint"><IconSoundOn /> Real reels we&apos;ve made. Tap any one for sound</p>
 
         <div className="bbr-teasers" ref={teaserRef}>
           {work.map(({ id: t, len, tag }, i) => (
@@ -368,7 +501,6 @@ export default function BrandReelsPage() {
                 aria-label={soundOn === t ? `Mute ${tag} reel` : `Play ${tag} reel with sound`}
               >
                 {soundOn === t ? <IconSoundOn /> : <IconSoundOff />}
-                <span>{soundOn === t ? 'Sound on' : 'Tap for sound'}</span>
               </button>
               <figcaption className="bbr-teaser-meta">
                 <span className="bbr-teaser-len">{len}</span>
@@ -399,123 +531,82 @@ export default function BrandReelsPage() {
             </figure>
           ))}
         </div>
-        <p className="bbr-wall-note">Every frame above is AI-generated. Every cut is made by BCON.</p>
       </section>
 
-      {/* ── WHAT YOU GET ─────────────────────────────────────── */}
-      <section className="bbr-section">
+      {/* ── LANGUAGES ────────────────────────────────────────── */}
+      <section className="bbr-langs" aria-label="Languages we make reels in">
+        <div className="bbr-container">
+          <div className="bbr-section-label">Every language your customers speak</div>
+        </div>
+        <div className="bbr-marquee bbr-marquee-langs">
+          <div className="bbr-marquee-track">
+            {[...languages, ...languages].map((l, i) => (
+              <span className="bbr-lang" key={i} aria-hidden={i >= languages.length} lang="">
+                <b>{l.native}</b>
+                {l.native !== l.name && <i>{l.name}</i>}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── WHAT YOU GET (carousel) ──────────────────────────── */}
+      <section className="bbr-section bbr-get">
         <div className="bbr-container">
           <div className="bbr-section-label">What you get</div>
-          <h2 className="bbr-section-heading">A film crew&apos;s output.<br /><span className="bbr-accent">Without the film crew.</span></h2>
-          <div className="bbr-grid bbr-grid-3">
-            <div className="bbr-card" data-reveal>
-              <span className="bbr-card-icon"><IconSpark /></span>
-              <h3>Brand-locked visuals</h3>
-              <p>Your product, logo, colours and tone, held consistent in every frame. It looks like you, not like a stock AI video.</p>
-            </div>
-            <div className="bbr-card" data-reveal>
-              <span className="bbr-card-icon"><IconScissors /></span>
-              <h3>Edited to the second</h3>
-              <p>Real editors cut every reel to the beat. Pacing, transitions and the hook in the first second are where reels win or die.</p>
-            </div>
-            <div className="bbr-card" data-reveal>
-              <span className="bbr-card-icon"><IconMusic /></span>
-              <h3>Music, captions, sound</h3>
-              <p>Scored, captioned and mixed so it lands with the sound on or off. Ready to post the moment it is approved.</p>
-            </div>
-            <div className="bbr-card" data-reveal>
-              <span className="bbr-card-icon"><IconPhone /></span>
-              <h3>Made for vertical</h3>
-              <p>Shot for 9:16 from the first frame. Built for Instagram Reels, Meta Ads, YouTube Shorts and WhatsApp status.</p>
-            </div>
-            <div className="bbr-card" data-reveal>
-              <span className="bbr-card-icon"><IconLayers /></span>
-              <h3>Variations to test</h3>
-              <p>Swap hooks, music and CTAs to give your ads multiple versions to test, instead of betting everything on one cut.</p>
-            </div>
-            <div className="bbr-card" data-reveal>
-              <span className="bbr-card-icon"><IconFilm /></span>
-              <h3>Any kind of brand</h3>
-              <p>Beverage, healthcare, FMCG, travel, tech. If you can describe it, we can put it on screen.</p>
-            </div>
-          </div>
+          <h2 className="bbr-section-heading">A film crew&apos;s output. <span className="bbr-accent">Without the film crew.</span></h2>
         </div>
-      </section>
-
-      {/* ── HOW IT WORKS ─────────────────────────────────────── */}
-      <section className="bbr-section">
-        <div className="bbr-container">
-          <div className="bbr-section-label">How it works</div>
-          <h2 className="bbr-section-heading">Pick it. Brief it. <span className="bbr-accent">Approve it. Done.</span></h2>
-          <ol className="bbr-steps">
-            {[
-              { h: 'Pick your reel', p: 'Choose 30s, 60s or a custom length.' },
-              { h: 'Share your brief', p: 'What you sell, who it is for and what you want them to do. Add product photos and your logo.' },
-              { h: 'Script + visual board', p: 'We send the complete script and a frame-by-frame visual board of your reel.' },
-              { h: 'Review + changes', p: 'You review the board and request changes. We revise before anything is generated.' },
-              { h: 'Generate + cut', p: 'Our AI pipeline builds every scene, then editors cut, score and caption it.' },
-              { h: 'Delivered', p: 'Your final vertical reel, with music and captions, ready to post or run as ads.' },
-            ].map((step, i) => (
-              <li data-reveal key={step.h}>
-                <span className="bbr-step-num">{String(i + 1).padStart(2, '0')}</span>
-                <div><h3>{step.h}</h3><p>{step.p}</p></div>
-              </li>
+        <div className="bbr-marquee bbr-marquee-cards">
+          <div className="bbr-marquee-track">
+            {[...features, ...features].map((f, i) => (
+              <div className="bbr-card bbr-marquee-card" key={i} aria-hidden={i >= features.length}>
+                <span className="bbr-card-icon">{f.icon}</span>
+                <h3>{f.h}</h3>
+                <p>{f.p}</p>
+              </div>
             ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* ── WHY ──────────────────────────────────────────────── */}
-      <section className="bbr-section">
-        <div className="bbr-container">
-          <div className="bbr-section-label">Why Brand Reels</div>
-          <h2 className="bbr-section-heading">The old way vs <span className="bbr-accent">the BCON way.</span></h2>
-          <div className="bbr-compare">
-            <div className="bbr-compare-col bbr-compare-old">
-              <h3>Traditional shoot</h3>
-              <ul>
-                <li>Crew, cast, studio, location</li>
-                <li>Weeks of pre-production</li>
-                <li>One shoot day, one set of shots</li>
-                <li>Reshoots cost as much as the shoot</li>
-                <li>One big video, little to test</li>
-              </ul>
-            </div>
-            <div className="bbr-compare-col bbr-compare-new">
-              <h3>BCON Brand Reels</h3>
-              <ul>
-                <li><IconCheck /> No shoot. Just a brief</li>
-                <li><IconCheck /> Concept to cut in days</li>
-                <li><IconCheck /> Any world, any scene, any product shot</li>
-                <li><IconCheck /> Changes without a reshoot</li>
-                <li><IconCheck /> Multiple cuts to test and scale</li>
-              </ul>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* ── CHOOSE YOUR CUT ──────────────────────────────────── */}
+      {/* ── PRICING + SPEED ──────────────────────────────────── */}
       <section className="bbr-section" id="pricing">
         <div className="bbr-container">
           <div className="bbr-section-label">Pricing</div>
-          <h2 className="bbr-section-heading">Choose your reel. <span className="bbr-accent">Everything included.</span></h2>
+          <h2 className="bbr-section-heading">Choose your reel. <span className="bbr-accent">Delivered in hours.</span></h2>
+
+          <div className="bbr-speed" data-reveal>
+            <div className="bbr-speed-item bbr-speed-main">
+              <span className="bbr-speed-num">&lt; 8 hrs</span>
+              <span className="bbr-speed-label">Average delivery time</span>
+            </div>
+            <div className="bbr-speed-item">
+              <span className="bbr-speed-num">4 hrs</span>
+              <span className="bbr-speed-label">30 second reel</span>
+            </div>
+            <div className="bbr-speed-item">
+              <span className="bbr-speed-num">8 hrs</span>
+              <span className="bbr-speed-label">60 second reel</span>
+            </div>
+            <p className="bbr-speed-note">Delivery clock starts once your script is final.</p>
+          </div>
+
           <div className="bbr-grid bbr-grid-3">
             {tiers.map((c) => (
               <div className="bbr-cut" key={c.len} data-reveal>
                 <div className="bbr-cut-len">{c.len}</div>
                 <h3>{c.name}</h3>
                 <div className="bbr-price">{c.price} <span>{c.per}</span></div>
+                <div className="bbr-cut-speed">
+                  <IconClock /> {c.speed ? <span>Delivered in <b>{c.speed}</b> once the script is final</span> : <span>Delivery time agreed with you</span>}
+                </div>
                 <p>{c.use}</p>
                 <ul className="bbr-includes">
                   {includes.map((item) => (
                     <li key={item}><IconCheck /> {item}</li>
                   ))}
                 </ul>
-                <button
-                  className="bbr-cut-btn"
-                  onClick={() => { setFormData((f) => ({ ...f, videoLength: c.len })); scrollToForm(); }}
-                >
+                <button className="bbr-cut-btn" onClick={() => openModal(c.len, `pricing_${c.len}`)}>
                   Choose {c.len} <ArrowRight className="bbr-cta-arrow" />
                 </button>
               </div>
@@ -524,18 +615,24 @@ export default function BrandReelsPage() {
         </div>
       </section>
 
-      {/* ── FORM ─────────────────────────────────────────────── */}
+      {/* ── WHAT WE DO + FORM ────────────────────────────────── */}
       <section className="bbr-section bbr-form-section" id="reel-form">
         <div className="bbr-container bbr-form-wrap">
           <div className="bbr-form-copy">
-            <div className="bbr-section-label">Start your reel</div>
-            <h2 className="bbr-section-heading">Tell us your brand.<br /><span className="bbr-accent">We&apos;ll pitch the film.</span></h2>
-            <p>Pick your reel and tell us about your brand. We&apos;ll come back with the complete script and visual board for you to review before anything is generated.</p>
-            <ul className="bbr-includes bbr-includes-form">
-              {includes.map((item) => (
-                <li key={item}><IconCheck /> {item}</li>
+            <div className="bbr-section-label">What we do</div>
+            <h2 className="bbr-section-heading">One studio.<br /><span className="bbr-accent">Every step in-house.</span></h2>
+            <p>
+              No freelancers, no outsourcing, no handoffs. The same team writes your script, plans every frame,
+              runs the AI and cuts the film. That&apos;s how we deliver in hours without losing your story.
+            </p>
+            <ol className="bbr-inhouse">
+              {inHouse.map((s) => (
+                <li key={s.n}>
+                  <span className="bbr-step-num">{s.n}</span>
+                  <div><h3>{s.h}</h3><p>{s.p}</p></div>
+                </li>
               ))}
-            </ul>
+            </ol>
           </div>
           <form className="bbr-form" onSubmit={handleSubmit} noValidate>
             <fieldset className="bbr-reel-pick">
@@ -584,6 +681,29 @@ export default function BrandReelsPage() {
         </div>
       </section>
 
+      {/* ── HOW IT WORKS ─────────────────────────────────────── */}
+      <section className="bbr-section">
+        <div className="bbr-container">
+          <div className="bbr-section-label">How it works</div>
+          <h2 className="bbr-section-heading">Pick it. Brief it. <span className="bbr-accent">Approve it. Done.</span></h2>
+          <ol className="bbr-steps">
+            {[
+              { h: 'Pick your reel', p: 'Choose 30s, 60s or a custom length.' },
+              { h: 'Share your brief', p: 'What you sell, who it is for, the language and what you want them to do.' },
+              { h: 'Script + visual board', p: 'We send the complete script and a frame-by-frame visual board of your reel.' },
+              { h: 'Review + changes', p: 'You review the board and ask for up to 3 changes. We revise before anything is generated.' },
+              { h: 'Generate + cut', p: 'Our AI pipeline builds every scene, then editors cut, score and caption it.' },
+              { h: 'Delivered', p: 'Your final vertical reel in hours, with music and captions, ready to post or run as ads.' },
+            ].map((step, i) => (
+              <li data-reveal key={step.h}>
+                <span className="bbr-step-num">{String(i + 1).padStart(2, '0')}</span>
+                <div><h3>{step.h}</h3><p>{step.p}</p></div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
       {/* ── FAQ ──────────────────────────────────────────────── */}
       <section className="bbr-section">
         <div className="bbr-container bbr-faq-wrap">
@@ -607,8 +727,8 @@ export default function BrandReelsPage() {
       <section className="bbr-section bbr-final">
         <div className="bbr-container">
           <h2 className="bbr-final-heading">Get your reels done<br /><span className="bbr-accent">starting from ₹5K.</span></h2>
-          <button className="bbr-cta-btn bbr-cta-large" onClick={scrollToForm}>
-            Get Your First Reel <ArrowRight className="bbr-cta-arrow" />
+          <button className="bbr-cta-btn bbr-cta-large" onClick={() => openModal('', 'final')}>
+            Start My Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
         </div>
       </section>
@@ -619,6 +739,66 @@ export default function BrandReelsPage() {
           <a href="/privacy">Privacy Policy</a>
         </div>
       </footer>
+
+      {/* ── QUICK POPUP FORM ─────────────────────────────────── */}
+      {modalOpen && (
+        <div className="bbr-modal" role="dialog" aria-modal="true" aria-labelledby="bbr-modal-title" onClick={() => setModalOpen(false)}>
+          <div className="bbr-modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="bbr-modal-close" onClick={() => setModalOpen(false)} aria-label="Close"><IconClose /></button>
+            {quickDone ? (
+              <div className="bbr-modal-done">
+                <span className="bbr-modal-done-icon"><IconCheck /></span>
+                <h3>Got it{quick.name ? `, ${quick.name.trim().split(' ')[0]}` : ''}.</h3>
+                <p>We&apos;ll reach out on WhatsApp shortly to start your reel.</p>
+                <button className="bbr-cta-btn" onClick={() => setModalOpen(false)}>Done</button>
+              </div>
+            ) : (
+              <form onSubmit={handleQuickSubmit} noValidate>
+                <h3 id="bbr-modal-title">Start your reel</h3>
+                <p className="bbr-modal-sub">Leave your number. We&apos;ll WhatsApp you to get your brief.</p>
+                <div className="bbr-modal-lengths" role="radiogroup" aria-label="Reel length">
+                  {['30s', '60s', 'Custom'].map((l) => (
+                    <button
+                      type="button"
+                      key={l}
+                      role="radio"
+                      aria-checked={quick.videoLength === l}
+                      className={`bbr-modal-length ${quick.videoLength === l ? 'bbr-modal-length-on' : ''}`}
+                      onClick={() => { setQuick({ ...quick, videoLength: l }); setQuickErr(''); }}
+                    >
+                      {l === 'Custom' ? 'Custom' : `${l} reel`}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  ref={quickNameRef}
+                  className="bbr-modal-input"
+                  type="text"
+                  placeholder="Your name"
+                  aria-label="Your name"
+                  value={quick.name}
+                  onChange={(e) => { setQuick({ ...quick, name: e.target.value }); setQuickErr(''); }}
+                />
+                <div className="bbr-modal-phone">
+                  <span>+91</span>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    placeholder="WhatsApp number"
+                    aria-label="WhatsApp number"
+                    value={quick.phone}
+                    onChange={(e) => { setQuick({ ...quick, phone: e.target.value }); setQuickErr(''); }}
+                  />
+                </div>
+                {quickErr && <em className="bbr-error">{quickErr}</em>}
+                <button type="submit" className="bbr-cta-btn bbr-submit">
+                  Start My Reel <ArrowRight className="bbr-cta-arrow" />
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
