@@ -1204,3 +1204,27 @@
   .bbr-rf-opt { flex-direction: column; gap: 2px; }
   .bbr-rf-opt span { text-align: left; }
 }
+
+/* ── PICKED-OPTION CHIPS (replace progress bar) ───────────────── */
+.bbr-rf-chips { display: flex; flex-wrap: wrap; gap: 8px; padding-right: 44px; }
+.bbr-rf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(205, 252, 46, 0.5);
+  background: rgba(205, 252, 46, 0.1);
+  color: #CDFC2E;
+  font-family: 'Anybody', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  animation: bbrChipIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: background 0.15s ease;
+}
+.bbr-rf-chip svg { width: 14px; height: 14px; }
+.bbr-rf-chip:hover { background: rgba(205, 252, 46, 0.2); }
+@keyframes bbrChipIn { from { opacity: 0; transform: scale(0.85); } }
+.bbr-rf .bbr-rf-step { margin-top: 0; }
+.bbr-modal .bbr-rf-step h3 { padding-right: 44px; }

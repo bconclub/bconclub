@@ -257,7 +257,7 @@ export default function AILeadMachinePage() {
       const utmTerm = utm.utm_term || '';
       const utmContent = utm.utm_content || '';
 
-      const res = await fetch('https://proxe.bconclub.com/api/website', {
+      const res = await fetch('/api/proxe-lead', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -269,8 +269,8 @@ export default function AILeadMachinePage() {
           message: `AI Lead Machine inquiry - Business Type: ${formData.businessType}`,
           form_type: 'contact',
           page_url: window.location.href,
-          // PROXe requires a non-empty brand or it rejects the lead with 400.
-          brand: formData.businessType?.trim() || formData.name?.trim() || 'Lead Machine Lead',
+          // Relay files the lead under brand 'bcon'; the business type rides along.
+          customer_brand: formData.businessType?.trim() || '',
           service: 'ai-lead-machine',
           utm_source: utmSource,
           utm_medium: utmMedium,
