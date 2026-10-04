@@ -98,7 +98,7 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
       const utmTerm = utm.utm_term || '';
       const utmContent = utm.utm_content || '';
 
-      const res = await fetch('https://proxe.bconclub.com/api/website', {
+      const res = await fetch('/api/proxe-lead', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,9 +110,7 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
           message: 'Newsletter subscription',
           form_type: 'newsletter',
           page_url: window.location.href,
-          // PROXe requires a non-empty brand or it rejects the lead with 400.
-          // Newsletter has no brand field, so use the subscriber's name.
-          brand: name?.trim() || 'Newsletter Subscriber',
+          // Relay files the lead under brand 'bcon'.
           utm_source: utmSource,
           utm_medium: utmMedium,
           utm_campaign: utmCampaign,

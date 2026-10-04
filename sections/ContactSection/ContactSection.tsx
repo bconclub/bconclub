@@ -83,7 +83,7 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
       const utmTerm = utm.utm_term || '';
       const utmContent = utm.utm_content || '';
 
-      const res = await fetch('https://proxe.bconclub.com/api/website', {
+      const res = await fetch('/api/proxe-lead', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,9 +95,8 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
           message: formData.service + (formData.brandName ? ` - Brand: ${formData.brandName}` : ''),
           form_type: 'contact',
           page_url: window.location.href,
-          // PROXe requires a non-empty brand or it rejects the lead with 400.
-          // Brand name is optional on the form, so fall back to the lead's name.
-          brand: formData.brandName?.trim() || formData.name?.trim() || 'Website Lead',
+          // Relay files the lead under brand 'bcon'; the customer's brand rides along.
+          customer_brand: formData.brandName?.trim() || '',
           service: formData.service,
           industry: formData.industry || '',
           app_type: formData.appType || '',

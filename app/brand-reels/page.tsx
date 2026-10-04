@@ -228,7 +228,7 @@ const pushEvent = (data: Record<string, unknown>) => {
 const submitToPROXe = async (data: Lead, source: string) => {
   try {
     const utm = getMergedUTMParams();
-    const res = await fetch('https://proxe.bconclub.com/api/website', {
+    const res = await fetch('/api/proxe-lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -238,8 +238,8 @@ const submitToPROXe = async (data: Lead, source: string) => {
         message: `Brand Reels inquiry (${source}) - Brand: ${data.brand || 'n/a'} - Length: ${data.videoLength} - Type: ${data.reelType}`,
         form_type: 'contact',
         page_url: window.location.href,
-        // PROXe requires a non-empty brand or it rejects the lead with 400.
-        brand: data.brand?.trim() || data.name?.trim() || 'Brand Reels Lead',
+        // Relay files the lead under brand 'bcon'; the customer's brand rides along.
+        customer_brand: data.brand?.trim() || '',
         service: 'brand-reels',
         video_length: data.videoLength,
         reel_type: data.reelType,
@@ -317,17 +317,25 @@ function ReelForm({ source, initialLength = '', onDone }: { source: string; init
     );
   }
 
-  const steps = ['Length', 'Type', 'Details'];
+  const lengthLabel = reelLengths.find((o) => o.value === lead.videoLength)?.label;
+  const typeLabel = reelTypes.find((o) => o.value === lead.reelType)?.label;
 
   return (
     <div className="bbr-rf">
-      <div className="bbr-rf-progress" aria-label={`Step ${step + 1} of 3`}>
-        {steps.map((label, i) => (
-          <span key={label} className={`bbr-rf-bar ${i <= step ? 'bbr-rf-bar-on' : ''}`}>
-            <i>{label}</i>
-          </span>
-        ))}
-      </div>
+      {step > 0 && (
+        <div className="bbr-rf-chips" aria-label="Your picks, tap to change">
+          {lengthLabel && (
+            <button type="button" className="bbr-rf-chip" onClick={() => setStep(0)}>
+              <IconCheck /> {lengthLabel}
+            </button>
+          )}
+          {step > 1 && typeLabel && (
+            <button type="button" className="bbr-rf-chip" onClick={() => setStep(1)}>
+              <IconCheck /> {typeLabel}
+            </button>
+          )}
+        </div>
+      )}
 
       {step === 0 && (
         <div className="bbr-rf-step" key="s0">
@@ -352,14 +360,12 @@ function ReelForm({ source, initialLength = '', onDone }: { source: string; init
               </button>
             ))}
           </div>
-          <button type="button" className="bbr-rf-back" onClick={() => setStep(0)}>← Back</button>
         </div>
       )}
 
       {step === 2 && (
         <form className="bbr-rf-step" key="s2" onSubmit={submit} noValidate>
           <h3>Where do we send your script?</h3>
-          <p className="bbr-rf-summary">{lead.videoLength} reel · {lead.reelType}</p>
           <input className="bbr-rf-input" type="text" placeholder="Your name" aria-label="Your name" autoFocus
             value={lead.name} onChange={(e) => { setLead({ ...lead, name: e.target.value }); setErr(''); }} />
           <input className="bbr-rf-input" type="text" placeholder="Brand name (optional)" aria-label="Brand name"
@@ -373,7 +379,6 @@ function ReelForm({ source, initialLength = '', onDone }: { source: string; init
           <button type="submit" className="bbr-cta-btn bbr-submit">
             Start My Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
-          <button type="button" className="bbr-rf-back" onClick={() => setStep(1)}>← Back</button>
         </form>
       )}
     </div>
@@ -767,10 +772,9 @@ export default function BrandReelsPage() {
 
       {/* ── QUICK POPUP FORM ─────────────────────────────────── */}
       {modalOpen && (
-        <div className="bbr-modal" role="dialog" aria-modal="true" aria-labelledby="bbr-modal-title" onClick={() => setModalOpen(false)}>
+        <div className="bbr-modal" role="dialog" aria-modal="true" aria-label="Start your reel" onClick={() => setModalOpen(false)}>
           <div className="bbr-modal-card" onClick={(e) => e.stopPropagation()}>
             <button className="bbr-modal-close" onClick={() => setModalOpen(false)} aria-label="Close"><IconClose /></button>
-            <h3 id="bbr-modal-title" className="bbr-modal-title">Start your reel</h3>
             <ReelForm key={modalKey} source="popup" initialLength={modalLength} onDone={() => setModalOpen(false)} />
           </div>
         </div>
