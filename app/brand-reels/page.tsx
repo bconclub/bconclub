@@ -104,7 +104,7 @@ const work = [
 
 // The workflow every reel follows (hero timeline)
 const flow = [
-  { h: 'Script', p: 'Written for your brand' },
+  { h: 'Script', p: 'Written for you' },
   { h: 'Visual board', p: 'Every frame planned' },
   { h: 'Review', p: 'Edit to your liking' },
   { h: 'Final reel', p: 'Music + captions' },
@@ -505,8 +505,8 @@ export default function BrandReelsPage() {
         </h1>
 
         <p className="bbr-hero-sub bbr-enter" style={d(380)}>
-          You bring the brief. We write the script, board it frame by frame and cut the film.
-          <strong> Made with AI, directed by people</strong>, and you sign off on every shot before it&apos;s made.
+          From script to final frame.<br />
+          <strong>Generated with AI, directed by people.</strong>
         </p>
 
         <ol className="bbr-flow" aria-label="How every reel is made">
