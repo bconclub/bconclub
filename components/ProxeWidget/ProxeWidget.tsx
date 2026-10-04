@@ -9,14 +9,22 @@ import './ProxeWidget.css';
 // /proxe now lives at goproxe.com (standalone). /proxe-cfs still hides the
 // embed widget so the security/platform page reads cleanly.
 const HIDDEN_ROUTES = ['/proxe-cfs'];
-const WHATSAPP_URL = 'https://wa.me/6360079756?text=Hi%2C%20I%20wanted%20to%20know%20more%20about%20AI%20Lead%20Machine.';
+// Pages that show the floating WhatsApp button above the PROXe bubble,
+// each with its own prefilled message.
+const WHATSAPP_PAGES: Record<string, string> = {
+  '/lead-machine': 'https://wa.me/6360079756?text=Hi%2C%20I%20wanted%20to%20know%20more%20about%20AI%20Lead%20Machine.',
+  '/brand-reels': 'https://wa.me/6360079756?text=Hi%2C%20I%20want%20to%20know%20more%20about%20BCON%20Brand%20Reels.',
+};
 
 export default function ProxeWidget() {
   const pathname = usePathname();
   const shouldHide = HIDDEN_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
-  const showWhatsApp = pathname === '/lead-machine' || pathname.startsWith('/lead-machine/');
+  const whatsAppRoute = Object.keys(WHATSAPP_PAGES).find(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+  const showWhatsApp = Boolean(whatsAppRoute);
 
   useEffect(() => {
     if (shouldHide || !showWhatsApp) return;
@@ -43,7 +51,9 @@ export default function ProxeWidget() {
 
       const panelIsOpen = proxeElements.some((element) => {
         const rect = element.getBoundingClientRect();
-        return rect.width > 140 || rect.height > 140;
+        // The bubble iframe is narrow but can be tall (~88x165), so only a
+        // frame that is both wide and tall counts as the open chat panel.
+        return rect.width > 140 && rect.height > 140;
       });
 
       if (panelIsOpen) {
@@ -55,7 +65,7 @@ export default function ProxeWidget() {
       const candidates = proxeElements
         .filter((element) => {
           const rect = element.getBoundingClientRect();
-          const isButtonSized = rect.width >= 40 && rect.width <= 96 && rect.height >= 40 && rect.height <= 96;
+          const isButtonSized = rect.width >= 40 && rect.width <= 96 && rect.height >= 40 && rect.height <= 200;
           const isBottomRight = window.innerWidth - rect.right <= 140 && window.innerHeight - rect.bottom <= 220;
 
           return isButtonSized && isBottomRight;
@@ -77,7 +87,11 @@ export default function ProxeWidget() {
         whatsapp.style.setProperty('pointer-events', 'auto');
         whatsapp.style.setProperty('left', `${Math.round(whatsappLeft)}px`);
         whatsapp.style.setProperty('right', 'auto');
-        whatsapp.style.setProperty('bottom', `${bottom + beaconRect.height + gap}px`);
+        // The visible bubble sits at the bottom of its frame and is about as
+        // tall as the frame is wide, so stack above that, not the whole frame.
+        const bubbleHeight = Math.min(beaconRect.height, beaconRect.width);
+        const beaconBottom = window.innerHeight - beaconRect.bottom;
+        whatsapp.style.setProperty('bottom', `${Math.round(beaconBottom + bubbleHeight + gap)}px`);
         return;
       }
 
@@ -103,7 +117,7 @@ export default function ProxeWidget() {
 
   const handleWhatsAppClick = () => {
     if (typeof window !== 'undefined' && (window as any).dataLayer) {
-      (window as any).dataLayer.push({ event: 'whatsapp_click', source: 'floating_widget' });
+      (window as any).dataLayer.push({ event: 'whatsapp_click', source: 'floating_widget', page: pathname });
     }
   };
 
@@ -116,7 +130,7 @@ export default function ProxeWidget() {
       {showWhatsApp && (
         <a
           className="proxe-whatsapp-button"
-          href={WHATSAPP_URL}
+          href={whatsAppRoute ? WHATSAPP_PAGES[whatsAppRoute] : undefined}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat with BCON on WhatsApp"
