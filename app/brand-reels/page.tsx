@@ -106,7 +106,7 @@ const work = [
 const flow = [
   { h: 'Script', p: 'Written for your brand' },
   { h: 'Visual board', p: 'Every frame planned' },
-  { h: 'Review', p: 'Up to 3 changes' },
+  { h: 'Review', p: 'Edit to your liking' },
   { h: 'Final reel', p: 'Music + captions' },
 ];
 
@@ -475,8 +475,7 @@ export default function BrandReelsPage() {
       <header className="bbr-header">
         <div className="bbr-header-inner">
           <a href="/" className="bbr-logo" aria-label="BCON Club home">
-            <img src="/BCON White logo.webp" alt="BCON" width={79} height={30} />
-            <span>Brand Reels</span>
+            <img src="/BCON White logo.webp" alt="BCON" width={106} height={40} />
           </a>
           <div className="bbr-header-actions">
             <a
@@ -489,7 +488,9 @@ export default function BrandReelsPage() {
             >
               <WhatsAppIcon size={20} />
             </a>
-            <button className="bbr-header-cta" onClick={() => openModal('', 'header')}>Start my reel</button>
+            <button className="bbr-header-cta" onClick={() => openModal('', 'header')} aria-label="Start my reel">
+              <ArrowRight />
+            </button>
           </div>
         </div>
       </header>
