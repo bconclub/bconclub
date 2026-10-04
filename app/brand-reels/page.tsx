@@ -625,7 +625,7 @@ export default function BrandReelsPage() {
       <section className="bbr-section bbr-get">
         <div className="bbr-container">
           <div className="bbr-section-label">What you get</div>
-          <h2 className="bbr-section-heading">A film crew&apos;s output. <span className="bbr-accent">Without the film crew.</span></h2>
+          <h2 className="bbr-section-heading">Studio-quality output. <span className="bbr-accent">Without the studio.</span></h2>
         </div>
         <div className="bbr-marquee bbr-marquee-cards">
           <div className="bbr-marquee-track">

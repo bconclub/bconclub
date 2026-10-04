@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'BCON Brand Reels | AI-Generated Brand Films | BCON Club',
   description:
-    'Scroll-stopping 30 and 60 second brand reels from ₹5,000, generated with AI and cut by BCON Club. No shoot, no crew, no studio. Ready for Instagram, Meta Ads and YouTube Shorts.',
+    'Scroll-stopping 30 and 60 second brand reels from ₹5,000, generated with AI and cut by BCON Club. Studio quality videos, at non-studio prices. Ready for Instagram, Meta Ads and YouTube Shorts.',
   alternates: { canonical: 'https://bconclub.com/brand-reels' },
   openGraph: {
     title: 'BCON Brand Reels | BCON Club',
