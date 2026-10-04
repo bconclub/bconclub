@@ -1406,3 +1406,45 @@
 @media (max-width: 640px) {
   .bbr-player-frame { height: auto; width: 100%; max-height: 74vh; }
 }
+
+/* ── "NOT A TOOL" STAMP ───────────────────────────────────────── */
+.bbr-h-top { position: relative; }
+.bbr-stamp {
+  position: absolute;
+  top: -0.75em;
+  right: -1.45em;
+  width: 118px;
+  height: 118px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: #CDFC2E;
+  color: #000;
+  clip-path: polygon(50% 0%, 61% 11%, 75% 6%, 79% 21%, 94% 25%, 89% 39%, 100% 50%, 89% 61%, 94% 75%, 79% 79%, 75% 94%, 61% 89%, 50% 100%, 39% 89%, 25% 94%, 21% 79%, 6% 75%, 11% 61%, 0% 50%, 11% 39%, 6% 25%, 21% 21%, 25% 6%, 39% 11%);
+  text-transform: uppercase;
+  letter-spacing: 0;
+  line-height: 1;
+  transform: rotate(12deg) scale(0);
+  animation: bbrStamp 0.5s 1.25s cubic-bezier(0.3, 1.6, 0.5, 1) forwards;
+  z-index: 2;
+}
+.bbr-stamp span { font-size: 11px; font-weight: 800; letter-spacing: 1px; }
+.bbr-stamp b { font-size: 17px; font-weight: 900; text-align: center; line-height: 0.95; }
+@keyframes bbrStamp { to { transform: rotate(12deg) scale(1); } }
+.bbr-modal-card:focus { outline: none; }
+.bbr-rf-opt:focus { outline: none; }
+.bbr-rf-opt:focus-visible { outline: 2px solid #CDFC2E; outline-offset: 2px; }
+@media (max-width: 960px) {
+  .bbr-stamp { right: -1.2em; top: -1em; width: 96px; height: 96px; }
+  .bbr-stamp span { font-size: 9px; }
+  .bbr-stamp b { font-size: 14px; }
+}
+@media (max-width: 640px) {
+  .bbr-stamp { right: -46px; top: -44px; width: 74px; height: 74px; }
+  .bbr-stamp span { font-size: 7.5px; }
+  .bbr-stamp b { font-size: 11.5px; }
+}
+
+.bbr-h-top > .bbr-stamp { display: flex; white-space: normal; }

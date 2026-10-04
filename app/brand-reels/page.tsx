@@ -465,7 +465,8 @@ export default function BrandReelsPage() {
     document.body.style.overflow = 'hidden';
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setModalOpen(false); };
     window.addEventListener('keydown', onKey);
-    const t = window.setTimeout(() => document.querySelector<HTMLButtonElement>('.bbr-modal .bbr-rf-opt')?.focus(), 60);
+    // Focus the dialog itself (not the first option) so nothing looks pre-selected
+    const t = window.setTimeout(() => document.querySelector<HTMLElement>('.bbr-modal-card')?.focus(), 60);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener('keydown', onKey);
@@ -550,7 +551,13 @@ export default function BrandReelsPage() {
         <div className="bbr-hero-badge bbr-enter" style={d(0)}><span className="bbr-rec" /> DONE-FOR-YOU BRAND REELS</div>
 
         <h1 className="bbr-hero-headline">
-          <span className="bbr-h-top bbr-enter" style={d(100)}>Your story,</span>
+          <span className="bbr-h-top bbr-enter" style={d(100)}>
+            Your story,
+            <span className="bbr-stamp" aria-label="Not a tool. Done for you.">
+              <span>Not a tool</span>
+              <b>Done<br />for you</b>
+            </span>
+          </span>
           <span className="bbr-h-bottom bbr-enter" style={d(220)}>told at the <span className="bbr-h-price">speed of AI.</span></span>
         </h1>
 
@@ -856,7 +863,7 @@ export default function BrandReelsPage() {
       {/* ── QUICK POPUP FORM ─────────────────────────────────── */}
       {modalOpen && (
         <div className="bbr-modal" role="dialog" aria-modal="true" aria-label="Get your reel made" onClick={() => setModalOpen(false)}>
-          <div className="bbr-modal-card" onClick={(e) => e.stopPropagation()}>
+          <div className="bbr-modal-card" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
             <button className="bbr-modal-close" onClick={() => setModalOpen(false)} aria-label="Close"><IconClose /></button>
             <ReelForm key={modalKey} source="popup" initialLength={modalLength} onDone={() => setModalOpen(false)} />
           </div>
