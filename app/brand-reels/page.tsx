@@ -84,15 +84,22 @@ const IconClose = () => (
 const WHATSAPP_URL = 'https://wa.me/6360079756?text=Hi%2C%20I%20want%20to%20know%20more%20about%20BCON%20Brand%20Reels.';
 
 /* ── Reel wall: short, muted, web-encoded loops in /public/brand-reels ── */
+// `full` is the full-length version with sound, opened in the player on tap
 const reels = [
-  { src: 'campa-cola', tag: 'Beverage' },
-  { src: 'scan2kare', tag: 'Healthcare' },
-  { src: 'parachute', tag: 'FMCG' },
-  { src: 'wowbus', tag: 'Travel' },
-  { src: 'lokazen', tag: 'Real estate' },
-  { src: 'proxe', tag: 'AI SaaS' },
-  { src: 'comet', tag: 'Footwear' },
+  { src: 'campa-cola', full: 'full-campa-cola', tag: 'Beverage' },
+  { src: 'scan2kare', full: 'work-scan2kare', tag: 'Healthcare' },
+  { src: 'parachute', full: 'full-parachute', tag: 'FMCG' },
+  { src: 'wowbus', full: 'full-wowbus', tag: 'Travel' },
+  { src: 'lokazen', full: 'work-lokazen', tag: 'Real estate' },
+  { src: 'proxe', full: 'full-proxe', tag: 'AI SaaS' },
+  { src: 'comet', full: 'full-comet', tag: 'Footwear' },
 ];
+
+const IconPlay = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M8 5v14l11-7z" />
+  </svg>
+);
 
 /* ── Finished client reels, full length with original audio ── */
 const work = [
@@ -377,7 +384,7 @@ function ReelForm({ source, initialLength = '', onDone }: { source: string; init
           </div>
           {err && <em className="bbr-error">{err}</em>}
           <button type="submit" className="bbr-cta-btn bbr-submit">
-            Start My Reel <ArrowRight className="bbr-cta-arrow" />
+            Get My Reel Made <ArrowRight className="bbr-cta-arrow" />
           </button>
         </form>
       )}
@@ -388,8 +395,11 @@ function ReelForm({ source, initialLength = '', onDone }: { source: string; init
 export default function BrandReelsPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const wallRef = useRef<HTMLDivElement>(null);
+  const getRef = useRef<HTMLDivElement>(null);
+  const [getEdge, setGetEdge] = useState({ start: true, end: false });
   const teaserRef = useRef<HTMLDivElement>(null);
   const [soundOn, setSoundOn] = useState<string | null>(null);
+  const [player, setPlayer] = useState<{ full: string; tag: string } | null>(null);
 
   // Quick popup form (name + phone + length) opened from every CTA
   const [modalOpen, setModalOpen] = useState(false);
@@ -435,6 +445,19 @@ export default function BrandReelsPage() {
     return () => obs.disconnect();
   }, []);
 
+  // Full-screen reel player: lock scroll, Escape closes
+  useEffect(() => {
+    if (!player) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setPlayer(null); };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [player]);
+
   // Modal: lock page scroll, close on Escape, focus the first field
   useEffect(() => {
     if (!modalOpen) return;
@@ -442,7 +465,8 @@ export default function BrandReelsPage() {
     document.body.style.overflow = 'hidden';
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setModalOpen(false); };
     window.addEventListener('keydown', onKey);
-    const t = window.setTimeout(() => document.querySelector<HTMLButtonElement>('.bbr-modal .bbr-rf-opt')?.focus(), 60);
+    // Focus the dialog itself (not the first option) so nothing looks pre-selected
+    const t = window.setTimeout(() => document.querySelector<HTMLElement>('.bbr-modal-card')?.focus(), 60);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener('keydown', onKey);
@@ -464,11 +488,33 @@ export default function BrandReelsPage() {
     if (next) pushEvent({ event: 'reel_sound_on', page: 'brand-reels', reel: next });
   };
 
+  const openPlayer = (full: string, tag: string) => {
+    // Silence any hero reel playing with sound
+    setSoundOn(null);
+    teaserRef.current?.querySelectorAll('video').forEach((v) => { v.muted = true; });
+    setPlayer({ full, tag });
+    pushEvent({ event: 'reel_open', page: 'brand-reels', reel: full });
+  };
+
   const openModal = (videoLength = '', source = 'cta') => {
     setModalLength(videoLength);
     setModalKey((k) => k + 1); // fresh form each time it opens
     setModalOpen(true);
     pushEvent({ event: 'brand_reels_modal_open', source });
+  };
+
+  // "What you get" carousel: moves only when the visitor swipes, drags or taps an arrow
+  const syncGetEdge = () => {
+    const el = getRef.current;
+    if (!el) return;
+    setGetEdge({ start: el.scrollLeft <= 4, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4 });
+  };
+  const scrollGet = (dir: 1 | -1) => {
+    const el = getRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>('.bbr-carousel-card');
+    const step = card ? card.offsetWidth + 16 : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir * step, behavior: 'smooth' });
   };
 
   const d = (ms: number) => ({ ['--d' as string]: `${ms}ms` }) as React.CSSProperties;
@@ -493,7 +539,7 @@ export default function BrandReelsPage() {
             >
               <WhatsAppIcon size={20} />
             </a>
-            <button className="bbr-header-cta" onClick={() => openModal('', 'header')} aria-label="Start my reel">
+            <button className="bbr-header-cta" onClick={() => openModal('', 'header')} aria-label="Get my reel made">
               <ArrowRight />
             </button>
           </div>
@@ -502,15 +548,21 @@ export default function BrandReelsPage() {
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="bbr-hero">
-        <div className="bbr-hero-badge bbr-enter" style={d(0)}><span className="bbr-rec" /> BCON BRAND REELS</div>
+        <div className="bbr-hero-badge bbr-enter" style={d(0)}><span className="bbr-rec" /> DONE-FOR-YOU BRAND REELS</div>
 
         <h1 className="bbr-hero-headline">
-          <span className="bbr-h-top bbr-enter" style={d(100)}>Your story,</span>
+          <span className="bbr-h-top bbr-enter" style={d(100)}>
+            Your story,
+            <span className="bbr-stamp" aria-label="Not a tool. Done for you.">
+              <span>Not a tool</span>
+              <b>Done<br />for you</b>
+            </span>
+          </span>
           <span className="bbr-h-bottom bbr-enter" style={d(220)}>told at the <span className="bbr-h-price">speed of AI.</span></span>
         </h1>
 
         <p className="bbr-hero-sub bbr-enter" style={d(380)}>
-          From script to final frame.<br />
+          We make your reel, script to final frame.<br />
           <strong>Generated with AI, directed by people.</strong>
         </p>
 
@@ -526,7 +578,7 @@ export default function BrandReelsPage() {
 
         <div className="bbr-hero-ctas bbr-enter" style={d(860)}>
           <button className="bbr-cta-btn" onClick={() => openModal('', 'hero')}>
-            Start My Reel <ArrowRight className="bbr-cta-arrow" />
+            Get My Reel Made <ArrowRight className="bbr-cta-arrow" />
           </button>
           <a
             className="bbr-ghost-btn"
@@ -545,7 +597,7 @@ export default function BrandReelsPage() {
         <p className="bbr-hero-proof bbr-enter" style={d(960)}>
           <b>No shoot.</b> <b>No crew.</b> <b>No studio.</b>
           <span className="bbr-hero-proof-sep" />
-          Every kind of brand, one studio.
+          Not a tool. A team that makes it for you.
         </p>
 
         <div className="bbr-teasers" id="reels" ref={teaserRef}>
@@ -586,7 +638,17 @@ export default function BrandReelsPage() {
       <section className="bbr-wall-section">
         <div className="bbr-wall" ref={wallRef}>
           {reels.map((r, i) => (
-            <figure className="bbr-reel" key={r.src} data-reveal style={{ transitionDelay: `${i * 70}ms` }}>
+            <figure
+              className="bbr-reel"
+              key={r.src}
+              data-reveal
+              style={{ transitionDelay: `${i * 70}ms` }}
+              onClick={() => openPlayer(r.full, r.tag)}
+              role="button"
+              tabIndex={0}
+              aria-label={`Watch the ${r.tag} reel with sound`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlayer(r.full, r.tag); } }}
+            >
               <video
                 src={`/brand-reels/${r.src}.mp4`}
                 poster={`/brand-reels/${r.src}.jpg`}
@@ -595,6 +657,7 @@ export default function BrandReelsPage() {
                 playsInline
                 preload="none"
               />
+              <span className="bbr-reel-play"><IconPlay /></span>
               <figcaption>
                 <span className="bbr-reel-num">CUT {String(i + 1).padStart(2, '0')}</span>
                 <span className="bbr-reel-tag">{r.tag}</span>
@@ -625,18 +688,26 @@ export default function BrandReelsPage() {
       <section className="bbr-section bbr-get">
         <div className="bbr-container">
           <div className="bbr-section-label">What you get</div>
-          <h2 className="bbr-section-heading">A film crew&apos;s output. <span className="bbr-accent">Without the film crew.</span></h2>
-        </div>
-        <div className="bbr-marquee bbr-marquee-cards">
-          <div className="bbr-marquee-track">
-            {[...features, ...features].map((f, i) => (
-              <div className="bbr-card bbr-marquee-card" key={i} aria-hidden={i >= features.length}>
-                <span className="bbr-card-icon">{f.icon}</span>
-                <h3>{f.h}</h3>
-                <p>{f.p}</p>
-              </div>
-            ))}
+          <div className="bbr-get-head">
+            <h2 className="bbr-section-heading">Studio-quality output. <span className="bbr-accent">Without the studio.</span></h2>
+            <div className="bbr-carousel-nav">
+              <button className="bbr-carousel-btn" onClick={() => scrollGet(-1)} disabled={getEdge.start} aria-label="Previous">
+                <ArrowRight className="bbr-carousel-prev" />
+              </button>
+              <button className="bbr-carousel-btn" onClick={() => scrollGet(1)} disabled={getEdge.end} aria-label="Next">
+                <ArrowRight />
+              </button>
+            </div>
           </div>
+        </div>
+        <div className="bbr-carousel" ref={getRef} onScroll={syncGetEdge} data-lenis-prevent>
+          {features.map((f) => (
+            <div className="bbr-card bbr-carousel-card" key={f.h}>
+              <span className="bbr-card-icon">{f.icon}</span>
+              <h3>{f.h}</h3>
+              <p>{f.p}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -758,7 +829,7 @@ export default function BrandReelsPage() {
         <div className="bbr-container">
           <h2 className="bbr-final-heading">Get your reels done<br /><span className="bbr-accent">starting from ₹5K.</span></h2>
           <button className="bbr-cta-btn bbr-cta-large" onClick={() => openModal('', 'final')}>
-            Start My Reel <ArrowRight className="bbr-cta-arrow" />
+            Get My Reel Made <ArrowRight className="bbr-cta-arrow" />
           </button>
         </div>
       </section>
@@ -770,10 +841,29 @@ export default function BrandReelsPage() {
         </div>
       </footer>
 
+      {/* ── FULL-SCREEN REEL PLAYER ────────────────────────────── */}
+      {player && (
+        <div className="bbr-player" role="dialog" aria-modal="true" aria-label={`${player.tag} reel`} onClick={() => setPlayer(null)}>
+          <div className="bbr-player-frame" onClick={(e) => e.stopPropagation()}>
+            <video
+              key={player.full}
+              src={`/brand-reels/${player.full}.mp4`}
+              controls
+              autoPlay
+              playsInline
+            />
+            <button className="bbr-modal-close bbr-player-close" onClick={() => setPlayer(null)} aria-label="Close"><IconClose /></button>
+          </div>
+          <button className="bbr-cta-btn bbr-player-cta" onClick={(e) => { e.stopPropagation(); setPlayer(null); openModal('', 'player'); }}>
+            Get My Reel Made <ArrowRight className="bbr-cta-arrow" />
+          </button>
+        </div>
+      )}
+
       {/* ── QUICK POPUP FORM ─────────────────────────────────── */}
       {modalOpen && (
-        <div className="bbr-modal" role="dialog" aria-modal="true" aria-label="Start your reel" onClick={() => setModalOpen(false)}>
-          <div className="bbr-modal-card" onClick={(e) => e.stopPropagation()}>
+        <div className="bbr-modal" role="dialog" aria-modal="true" aria-label="Get your reel made" onClick={() => setModalOpen(false)}>
+          <div className="bbr-modal-card" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
             <button className="bbr-modal-close" onClick={() => setModalOpen(false)} aria-label="Close"><IconClose /></button>
             <ReelForm key={modalKey} source="popup" initialLength={modalLength} onDone={() => setModalOpen(false)} />
           </div>
