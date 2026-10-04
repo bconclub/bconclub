@@ -709,7 +709,7 @@
   text-decoration: none;
   color: #fff;
 }
-.bbr-logo img { height: 26px; width: auto; display: block; }
+.bbr-logo img { height: 40px; width: auto; max-width: 150px; object-fit: contain; display: block; }
 .bbr-logo span {
   font-size: 12px;
   font-weight: 800;
@@ -736,18 +736,20 @@
 }
 .bbr-wa-btn:hover { background: #1fb955; transform: translateY(-1px); }
 .bbr-header-cta {
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 1px solid #CDFC2E;
-  background: transparent;
-  color: #CDFC2E;
-  font-family: 'Anybody', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: #CDFC2E;
+  color: #000;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
-.bbr-header-cta:hover { background: #CDFC2E; color: #000; }
+.bbr-header-cta svg { width: 20px; height: 20px; }
+.bbr-header-cta:hover { background: #b8e020; transform: translateX(2px); }
 
 /* ── HERO WORKFLOW TIMELINE ───────────────────────────────────── */
 .bbr-flow {
@@ -760,17 +762,28 @@
   grid-template-columns: repeat(4, 1fr);
   position: relative;
 }
-.bbr-flow::before {
+/* Track (dim) + progress (lime) that fills 01 → 04 in ~1s after the hero lands */
+.bbr-flow::before,
+.bbr-flow::after {
   content: '';
   position: absolute;
   top: 17px;
   left: 12.5%;
   right: 12.5%;
   height: 2px;
-  background: linear-gradient(90deg, rgba(205, 252, 46, 0.15), #CDFC2E, rgba(205, 252, 46, 0.15));
+  border-radius: 2px;
 }
+.bbr-flow::before { background: #262626; }
+.bbr-flow::after {
+  background: #CDFC2E;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: bbrFlowFill 1s 0.95s linear forwards;
+}
+@keyframes bbrFlowFill { to { transform: scaleX(1); } }
 .bbr-flow li {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -785,14 +798,26 @@
   align-items: center;
   justify-content: center;
   background: #000;
-  border: 2px solid #CDFC2E;
-  color: #CDFC2E;
+  border: 2px solid #333;
+  color: #555;
   font-family: ui-monospace, monospace;
   font-size: 12px;
   font-weight: 700;
   margin-bottom: 4px;
+  animation: bbrFlowDot 0.25s ease forwards;
 }
-.bbr-flow li:last-child .bbr-flow-dot { background: #CDFC2E; color: #000; }
+.bbr-flow li:nth-child(1) .bbr-flow-dot { animation-delay: 0.95s; }
+.bbr-flow li:nth-child(2) .bbr-flow-dot { animation-delay: 1.28s; }
+.bbr-flow li:nth-child(3) .bbr-flow-dot { animation-delay: 1.62s; }
+.bbr-flow li:nth-child(4) .bbr-flow-dot { animation: bbrFlowDone 0.35s 1.95s ease forwards; }
+@keyframes bbrFlowDot {
+  50% { transform: scale(1.18); }
+  to { border-color: #CDFC2E; color: #CDFC2E; transform: scale(1); }
+}
+@keyframes bbrFlowDone {
+  50% { transform: scale(1.22); box-shadow: 0 0 0 8px rgba(205, 252, 46, 0.18); }
+  to { border-color: #CDFC2E; background: #CDFC2E; color: #000; transform: scale(1); box-shadow: 0 0 0 0 rgba(205, 252, 46, 0); }
+}
 .bbr-flow-h { font-size: 15px; font-weight: 800; color: #fff; }
 .bbr-flow-p { font-size: 12px; color: #8A8A8A; }
 
@@ -1026,20 +1051,21 @@
 
 /* ── RESPONSIVE (new blocks) ──────────────────────────────────── */
 @media (max-width: 960px) {
+  .bbr-logo img { height: 32px; max-width: 120px; }
   .bbr-speed { grid-template-columns: 1fr 1fr; }
   .bbr-speed-main { grid-column: 1 / -1; }
 }
 @media (max-width: 640px) {
   .bbr-header-inner { padding: 10px 16px; }
-  .bbr-logo img { height: 22px; }
+  .bbr-logo img { height: 28px; max-width: 100px; }
   .bbr-logo span { display: none; }
   .bbr-wa-btn { width: 38px; height: 38px; }
-  .bbr-header-cta { padding: 9px 12px; font-size: 13px; }
+  .bbr-header-cta { width: 38px; height: 38px; }
   .bbr-hero { padding-top: 48px; }
   .bbr-flow-h { font-size: 13px; }
   .bbr-flow-p { font-size: 11px; }
   .bbr-flow-dot { width: 32px; height: 32px; font-size: 11px; }
-  .bbr-flow::before { top: 15px; }
+  .bbr-flow::before, .bbr-flow::after { top: 15px; }
   .bbr-lang { padding: 0 22px; }
   .bbr-marquee-card { flex-basis: 260px; }
   .bbr-speed-item { padding: 18px 20px; }
