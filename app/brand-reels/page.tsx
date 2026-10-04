@@ -384,7 +384,7 @@ function ReelForm({ source, initialLength = '', onDone }: { source: string; init
           </div>
           {err && <em className="bbr-error">{err}</em>}
           <button type="submit" className="bbr-cta-btn bbr-submit">
-            Get My Reel Made <ArrowRight className="bbr-cta-arrow" />
+            Get Your Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
         </form>
       )}
@@ -450,10 +450,12 @@ export default function BrandReelsPage() {
     if (!player) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('bbr-overlay-open');
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setPlayer(null); };
     window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prev;
+      document.body.classList.remove('bbr-overlay-open');
       window.removeEventListener('keydown', onKey);
     };
   }, [player]);
@@ -463,12 +465,14 @@ export default function BrandReelsPage() {
     if (!modalOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('bbr-overlay-open');
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setModalOpen(false); };
     window.addEventListener('keydown', onKey);
     // Focus the dialog itself (not the first option) so nothing looks pre-selected
     const t = window.setTimeout(() => document.querySelector<HTMLElement>('.bbr-modal-card')?.focus(), 60);
     return () => {
       document.body.style.overflow = prev;
+      document.body.classList.remove('bbr-overlay-open');
       window.removeEventListener('keydown', onKey);
       window.clearTimeout(t);
     };
@@ -539,7 +543,7 @@ export default function BrandReelsPage() {
             >
               <WhatsAppIcon size={20} />
             </a>
-            <button className="bbr-header-cta" onClick={() => openModal('', 'header')} aria-label="Get my reel made">
+            <button className="bbr-header-cta" onClick={() => openModal('', 'header')} aria-label="Get your reel">
               <ArrowRight />
             </button>
           </div>
@@ -553,10 +557,6 @@ export default function BrandReelsPage() {
         <h1 className="bbr-hero-headline">
           <span className="bbr-h-top bbr-enter" style={d(100)}>
             Your story,
-            <span className="bbr-stamp" aria-label="Not a tool. Done for you.">
-              <span>Not a tool</span>
-              <b>Done<br />for you</b>
-            </span>
           </span>
           <span className="bbr-h-bottom bbr-enter" style={d(220)}>told at the <span className="bbr-h-price">speed of AI.</span></span>
         </h1>
@@ -578,7 +578,7 @@ export default function BrandReelsPage() {
 
         <div className="bbr-hero-ctas bbr-enter" style={d(860)}>
           <button className="bbr-cta-btn" onClick={() => openModal('', 'hero')}>
-            Get My Reel Made <ArrowRight className="bbr-cta-arrow" />
+            Get Your Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
           <a
             className="bbr-ghost-btn"
@@ -829,7 +829,7 @@ export default function BrandReelsPage() {
         <div className="bbr-container">
           <h2 className="bbr-final-heading">Get your reels done<br /><span className="bbr-accent">starting from ₹5K.</span></h2>
           <button className="bbr-cta-btn bbr-cta-large" onClick={() => openModal('', 'final')}>
-            Get My Reel Made <ArrowRight className="bbr-cta-arrow" />
+            Get Your Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
         </div>
       </section>
@@ -855,14 +855,14 @@ export default function BrandReelsPage() {
             <button className="bbr-modal-close bbr-player-close" onClick={() => setPlayer(null)} aria-label="Close"><IconClose /></button>
           </div>
           <button className="bbr-cta-btn bbr-player-cta" onClick={(e) => { e.stopPropagation(); setPlayer(null); openModal('', 'player'); }}>
-            Get My Reel Made <ArrowRight className="bbr-cta-arrow" />
+            Get Your Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
         </div>
       )}
 
       {/* ── QUICK POPUP FORM ─────────────────────────────────── */}
       {modalOpen && (
-        <div className="bbr-modal" role="dialog" aria-modal="true" aria-label="Get your reel made" onClick={() => setModalOpen(false)}>
+        <div className="bbr-modal" role="dialog" aria-modal="true" aria-label="Get your reel" onClick={() => setModalOpen(false)}>
           <div className="bbr-modal-card" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
             <button className="bbr-modal-close" onClick={() => setModalOpen(false)} aria-label="Close"><IconClose /></button>
             <ReelForm key={modalKey} source="popup" initialLength={modalLength} onDone={() => setModalOpen(false)} />

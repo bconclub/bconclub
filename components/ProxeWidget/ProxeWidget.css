@@ -6,8 +6,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   color: #fff;
   background: #25d366;
@@ -29,21 +29,21 @@
 
 .proxe-whatsapp-button svg {
   display: block;
-  width: 29px;
-  height: 29px;
+  width: 26px;
+  height: 26px;
 }
 
 @media (max-width: 640px) {
   .proxe-whatsapp-button {
     right: 18px;
     bottom: 86px;
-    width: 54px;
-    height: 54px;
+    width: 48px;
+    height: 48px;
   }
 
   .proxe-whatsapp-button svg {
-    width: 29px;
-    height: 29px;
+    width: 26px;
+    height: 26px;
   }
 }
 
