@@ -144,10 +144,31 @@ const tiers = [
   { len: 'Custom', name: 'Your Cut', price: 'Quoted', per: 'by length', speed: '', use: 'Longer films, a series or a batch of cuts. Priced on the length you need.' },
 ];
 
-const lengthOptions = [
-  { value: '30s', label: '30 second reel', price: '₹5,000' },
-  { value: '60s', label: '60 second reel', price: '₹10,000' },
-  { value: 'Custom', label: 'Custom length', price: 'Quoted by length' },
+const IconPen = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+  </svg>
+);
+
+const IconBoard = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+  </svg>
+);
+
+const reelLengths = [
+  { value: '30s', label: '30 seconds', hint: 'Ads, Reels, quick hooks' },
+  { value: '60s', label: '60 seconds', hint: 'Brand films, launches' },
+  { value: 'Custom', label: 'Custom', hint: 'Longer or a series' },
+];
+
+const reelTypes = [
+  { value: 'Ad', label: 'Ad', hint: 'Meta / Google ads' },
+  { value: 'Social post', label: 'Social post', hint: 'Instagram, YouTube Shorts' },
+  { value: 'Product launch', label: 'Product launch', hint: 'New product or offer' },
+  { value: 'Brand film', label: 'Brand film', hint: 'Your story, website hero' },
+  { value: 'Other', label: 'Something else', hint: 'Tell us on WhatsApp' },
 ];
 
 // What every reel order includes, whatever the length
@@ -159,10 +180,10 @@ const includes = [
 ];
 
 const inHouse = [
-  { n: '01', h: 'Script', p: 'Written by our team around your brief.' },
-  { n: '02', h: 'Visual board', p: 'Every frame planned before it is made.' },
-  { n: '03', h: 'AI generation', p: 'Run on our own pipeline, locked to your brand.' },
-  { n: '04', h: 'Edit + sound', p: 'Cut, scored and captioned by our editors.' },
+  { icon: <IconPen />, h: 'Script', p: 'Written by our team around your brief.' },
+  { icon: <IconBoard />, h: 'Visual board', p: 'Every frame planned before it is made.' },
+  { icon: <IconSpark />, h: 'AI generation', p: 'Run on our own pipeline, locked to your brand.' },
+  { icon: <IconScissors />, h: 'Edit + sound', p: 'Cut, scored and captioned by our editors.' },
 ];
 
 const faqs = [
@@ -192,19 +213,19 @@ const faqs = [
   },
 ];
 
-interface FormData {
+interface Lead {
   name: string;
   brand: string;
   phone: string;
-  email: string;
   videoLength: string;
+  reelType: string;
 }
 
 const pushEvent = (data: Record<string, unknown>) => {
   if (typeof window !== 'undefined' && (window as any).dataLayer) (window as any).dataLayer.push(data);
 };
 
-const submitToPROXe = async (data: FormData, source: string) => {
+const submitToPROXe = async (data: Lead, source: string) => {
   try {
     const utm = getMergedUTMParams();
     const res = await fetch('https://proxe.bconclub.com/api/website', {
@@ -212,15 +233,16 @@ const submitToPROXe = async (data: FormData, source: string) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: data.name,
-        email: data.email,
+        email: '',
         phone: data.phone || '',
-        message: `Brand Reels inquiry (${source}) - Brand: ${data.brand || 'n/a'} - Video length: ${data.videoLength}`,
+        message: `Brand Reels inquiry (${source}) - Brand: ${data.brand || 'n/a'} - Length: ${data.videoLength} - Type: ${data.reelType}`,
         form_type: 'contact',
         page_url: window.location.href,
         // PROXe requires a non-empty brand or it rejects the lead with 400.
         brand: data.brand?.trim() || data.name?.trim() || 'Brand Reels Lead',
         service: 'brand-reels',
         video_length: data.videoLength,
+        reel_type: data.reelType,
         utm_source: utm.utm_source || '',
         utm_medium: utm.utm_medium || '',
         utm_campaign: utm.utm_campaign || '',
@@ -237,21 +259,137 @@ const submitToPROXe = async (data: FormData, source: string) => {
   }
 };
 
+/* ── Step-by-step reel form: length → type → details ── */
+function ReelForm({ source, initialLength = '', onDone }: { source: string; initialLength?: string; onDone?: () => void }) {
+  const [step, setStep] = useState(initialLength ? 1 : 0);
+  const [lead, setLead] = useState<Lead>({ name: '', brand: '', phone: '', videoLength: initialLength, reelType: '' });
+  const [err, setErr] = useState('');
+  const [done, setDone] = useState(false);
+
+  const pick = (key: 'videoLength' | 'reelType', value: string) => {
+    setLead((l) => ({ ...l, [key]: value }));
+    setErr('');
+    setStep((s) => s + 1);
+    pushEvent({ event: 'brand_reels_form_step', source, step: key, value });
+  };
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!lead.name.trim()) { setErr('Please enter your name'); return; }
+    const digits = lead.phone.replace(/\D/g, '').slice(-10);
+    if (digits.length !== 10) { setErr('Please enter a valid 10 digit WhatsApp number'); return; }
+    setErr('');
+    const phone = `+91${digits}`;
+    const data = { ...lead, name: lead.name.trim(), brand: lead.brand.trim(), phone };
+
+    pushEvent({ event: 'web_lead', formType: 'Brand Reels', source, service: 'brand-reels', videoLength: data.videoLength, reelType: data.reelType });
+    // Inline success (no /thank-you redirect), so fire the Meta Lead event here.
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Lead', { content_name: 'Brand Reels' });
+    }
+
+    submitToPROXe(data, source);
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'lead',
+        data: {
+          name: data.name,
+          phone,
+          service: `BCON Brand Reels - ${data.videoLength} ${data.reelType} (${source})`,
+          brandName: data.brand,
+        },
+      }),
+    }).catch((error) => console.error('Email notification failed:', error));
+
+    setDone(true);
+  };
+
+  if (done) {
+    return (
+      <div className="bbr-rf-done">
+        <span className="bbr-rf-done-icon"><IconCheck /></span>
+        <h3>Got it, {lead.name.trim().split(' ')[0]}.</h3>
+        <p>We&apos;ll reach out on WhatsApp shortly to take your brief.</p>
+        {onDone && <button className="bbr-cta-btn" onClick={onDone}>Done</button>}
+      </div>
+    );
+  }
+
+  const steps = ['Length', 'Type', 'Details'];
+
+  return (
+    <div className="bbr-rf">
+      <div className="bbr-rf-progress" aria-label={`Step ${step + 1} of 3`}>
+        {steps.map((label, i) => (
+          <span key={label} className={`bbr-rf-bar ${i <= step ? 'bbr-rf-bar-on' : ''}`}>
+            <i>{label}</i>
+          </span>
+        ))}
+      </div>
+
+      {step === 0 && (
+        <div className="bbr-rf-step" key="s0">
+          <h3>How long is your reel?</h3>
+          <div className="bbr-rf-options">
+            {reelLengths.map((o) => (
+              <button type="button" key={o.value} className={`bbr-rf-opt ${lead.videoLength === o.value ? 'bbr-rf-opt-on' : ''}`} onClick={() => pick('videoLength', o.value)}>
+                <b>{o.label}</b><span>{o.hint}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {step === 1 && (
+        <div className="bbr-rf-step" key="s1">
+          <h3>What is the reel for?</h3>
+          <div className="bbr-rf-options">
+            {reelTypes.map((o) => (
+              <button type="button" key={o.value} className={`bbr-rf-opt ${lead.reelType === o.value ? 'bbr-rf-opt-on' : ''}`} onClick={() => pick('reelType', o.value)}>
+                <b>{o.label}</b><span>{o.hint}</span>
+              </button>
+            ))}
+          </div>
+          <button type="button" className="bbr-rf-back" onClick={() => setStep(0)}>← Back</button>
+        </div>
+      )}
+
+      {step === 2 && (
+        <form className="bbr-rf-step" key="s2" onSubmit={submit} noValidate>
+          <h3>Where do we send your script?</h3>
+          <p className="bbr-rf-summary">{lead.videoLength} reel · {lead.reelType}</p>
+          <input className="bbr-rf-input" type="text" placeholder="Your name" aria-label="Your name" autoFocus
+            value={lead.name} onChange={(e) => { setLead({ ...lead, name: e.target.value }); setErr(''); }} />
+          <input className="bbr-rf-input" type="text" placeholder="Brand name (optional)" aria-label="Brand name"
+            value={lead.brand} onChange={(e) => setLead({ ...lead, brand: e.target.value })} />
+          <div className="bbr-rf-phone">
+            <span>+91</span>
+            <input type="tel" inputMode="numeric" placeholder="WhatsApp number" aria-label="WhatsApp number"
+              value={lead.phone} onChange={(e) => { setLead({ ...lead, phone: e.target.value }); setErr(''); }} />
+          </div>
+          {err && <em className="bbr-error">{err}</em>}
+          <button type="submit" className="bbr-cta-btn bbr-submit">
+            Start My Reel <ArrowRight className="bbr-cta-arrow" />
+          </button>
+          <button type="button" className="bbr-rf-back" onClick={() => setStep(1)}>← Back</button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function BrandReelsPage() {
-  const [formData, setFormData] = useState<FormData>({ name: '', brand: '', phone: '', email: '', videoLength: '' });
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [submitting, setSubmitting] = useState(false);
   const wallRef = useRef<HTMLDivElement>(null);
   const teaserRef = useRef<HTMLDivElement>(null);
   const [soundOn, setSoundOn] = useState<string | null>(null);
 
   // Quick popup form (name + phone + length) opened from every CTA
   const [modalOpen, setModalOpen] = useState(false);
-  const [quick, setQuick] = useState({ name: '', phone: '', videoLength: '' });
-  const [quickErr, setQuickErr] = useState('');
-  const [quickDone, setQuickDone] = useState(false);
-  const quickNameRef = useRef<HTMLInputElement>(null);
+  const [modalLength, setModalLength] = useState('');
+  const [modalKey, setModalKey] = useState(0);
 
   // Reveal [data-reveal] elements as they enter view. Uses a data attribute,
   // not a class, so React re-renders of className never undo the reveal.
@@ -299,7 +437,7 @@ export default function BrandReelsPage() {
     document.body.style.overflow = 'hidden';
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setModalOpen(false); };
     window.addEventListener('keydown', onKey);
-    const t = window.setTimeout(() => quickNameRef.current?.focus(), 60);
+    const t = window.setTimeout(() => document.querySelector<HTMLButtonElement>('.bbr-modal .bbr-rf-opt')?.focus(), 60);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener('keydown', onKey);
@@ -322,94 +460,10 @@ export default function BrandReelsPage() {
   };
 
   const openModal = (videoLength = '', source = 'cta') => {
-    setQuick((q) => ({ ...q, videoLength: videoLength || q.videoLength }));
-    setQuickErr('');
+    setModalLength(videoLength);
+    setModalKey((k) => k + 1); // fresh form each time it opens
     setModalOpen(true);
     pushEvent({ event: 'brand_reels_modal_open', source });
-  };
-
-  const handleQuickSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quick.name.trim()) { setQuickErr('Please enter your name'); return; }
-    const digits = quick.phone.replace(/\D/g, '').slice(-10);
-    if (digits.length !== 10) { setQuickErr('Please enter a valid 10 digit phone number'); return; }
-    if (!quick.videoLength) { setQuickErr('Pick a reel length'); return; }
-    setQuickErr('');
-    const phone = `+91${digits}`;
-
-    pushEvent({ event: 'web_lead', formType: 'Brand Reels Quick', service: 'brand-reels', videoLength: quick.videoLength });
-    // Inline success (no /thank-you redirect), so fire the Meta Lead event here.
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('track', 'Lead', { content_name: 'Brand Reels Quick' });
-    }
-
-    submitToPROXe({ name: quick.name.trim(), brand: '', phone, email: '', videoLength: quick.videoLength }, 'popup');
-    fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'lead',
-        data: { name: quick.name.trim(), phone, service: `BCON Brand Reels - ${quick.videoLength} (popup)` },
-      }),
-    }).catch((err) => console.error('Email notification failed:', err));
-
-    setQuickDone(true);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: '' });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.brand.trim()) newErrors.brand = 'Brand name is required';
-    const phoneDigits = formData.phone.replace(/\D/g, '');
-    if (phoneDigits.length < 10) newErrors.phone = 'Valid phone number is required';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Valid email is required';
-    if (!formData.videoLength) newErrors.videoLength = 'Pick your reel';
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
-
-    setSubmitting(true);
-    pushEvent({
-      event: 'web_lead',
-      formType: 'Brand Reels',
-      service: 'brand-reels',
-      brandName: formData.brand,
-      videoLength: formData.videoLength,
-    });
-
-    submitToPROXe(formData, 'form');
-
-    fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'lead',
-        data: {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          service: `BCON Brand Reels - ${formData.videoLength}`,
-          brandName: formData.brand,
-        },
-      }),
-    }).catch((err) => console.error('Email notification failed:', err));
-
-    setTimeout(() => {
-      const params = new URLSearchParams({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        brandName: formData.brand,
-        service: 'brand-reels',
-        videoLength: formData.videoLength,
-      });
-      window.location.href = `/thank-you?${params.toString()}`;
-    }, 200);
   };
 
   const d = (ms: number) => ({ ['--d' as string]: `${ms}ms` }) as React.CSSProperties;
@@ -433,7 +487,7 @@ export default function BrandReelsPage() {
               aria-label="Chat with us on WhatsApp"
               onClick={() => pushEvent({ event: 'whatsapp_click', source: 'brand_reels_header' })}
             >
-              <WhatsAppIcon size={18} /> <span>WhatsApp</span>
+              <WhatsAppIcon size={20} />
             </a>
             <button className="bbr-header-cta" onClick={() => openModal('', 'header')}>Start my reel</button>
           </div>
@@ -468,7 +522,18 @@ export default function BrandReelsPage() {
           <button className="bbr-cta-btn" onClick={() => openModal('', 'hero')}>
             Start My Reel <ArrowRight className="bbr-cta-arrow" />
           </button>
-          <a className="bbr-ghost-btn" href="#reels">See our reels</a>
+          <a
+            className="bbr-ghost-btn"
+            href="#reels"
+            onClick={(e) => {
+              // Lenis smooth-scroll swallows plain hash jumps, so scroll explicitly
+              e.preventDefault();
+              document.getElementById('reels')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              pushEvent({ event: 'see_reels_click', page: 'brand-reels' });
+            }}
+          >
+            See our reels
+          </a>
         </div>
 
         <p className="bbr-hero-proof bbr-enter" style={d(960)}>
@@ -477,7 +542,7 @@ export default function BrandReelsPage() {
           Every kind of brand, one studio.
         </p>
 
-        <div className="bbr-teasers" ref={teaserRef}>
+        <div className="bbr-teasers" id="reels" ref={teaserRef}>
           {work.map(({ id: t, len, tag }, i) => (
             <figure
               className={`bbr-teaser ${soundOn === t ? 'bbr-teaser-live' : ''}`}
@@ -512,7 +577,7 @@ export default function BrandReelsPage() {
       </section>
 
       {/* ── REEL WALL ────────────────────────────────────────── */}
-      <section className="bbr-wall-section" id="reels">
+      <section className="bbr-wall-section">
         <div className="bbr-wall" ref={wallRef}>
           {reels.map((r, i) => (
             <figure className="bbr-reel" key={r.src} data-reveal style={{ transitionDelay: `${i * 70}ms` }}>
@@ -627,57 +692,16 @@ export default function BrandReelsPage() {
             </p>
             <ol className="bbr-inhouse">
               {inHouse.map((s) => (
-                <li key={s.n}>
-                  <span className="bbr-step-num">{s.n}</span>
+                <li key={s.h}>
+                  <span className="bbr-inhouse-icon">{s.icon}</span>
                   <div><h3>{s.h}</h3><p>{s.p}</p></div>
                 </li>
               ))}
             </ol>
           </div>
-          <form className="bbr-form" onSubmit={handleSubmit} noValidate>
-            <fieldset className="bbr-reel-pick">
-              <legend>Pick your reel</legend>
-              {lengthOptions.map((o) => (
-                <label
-                  key={o.value}
-                  className={`bbr-reel-option ${formData.videoLength === o.value ? 'bbr-reel-option-on' : ''} ${errors.videoLength ? 'bbr-input-error' : ''}`}
-                >
-                  <input
-                    type="radio"
-                    name="videoLength"
-                    value={o.value}
-                    checked={formData.videoLength === o.value}
-                    onChange={handleChange}
-                  />
-                  <span className="bbr-reel-option-label">{o.label}</span>
-                  <span className="bbr-reel-option-price">{o.price}</span>
-                </label>
-              ))}
-              {errors.videoLength && <em className="bbr-error">{errors.videoLength}</em>}
-            </fieldset>
-            {([
-              { name: 'name', label: 'Your name', type: 'text', placeholder: 'Full name' },
-              { name: 'brand', label: 'Brand name', type: 'text', placeholder: 'What is your brand called?' },
-              { name: 'phone', label: 'Phone', type: 'tel', placeholder: '+91 98765 43210' },
-              { name: 'email', label: 'Email', type: 'email', placeholder: 'you@brand.com' },
-            ] as const).map((f) => (
-              <label className="bbr-field" key={f.name}>
-                <span>{f.label}</span>
-                <input
-                  name={f.name}
-                  type={f.type}
-                  placeholder={f.placeholder}
-                  value={formData[f.name]}
-                  onChange={handleChange}
-                  className={errors[f.name] ? 'bbr-input-error' : ''}
-                />
-                {errors[f.name] && <em className="bbr-error">{errors[f.name]}</em>}
-              </label>
-            ))}
-            <button type="submit" className="bbr-cta-btn bbr-submit" disabled={submitting}>
-              {submitting ? 'Sending...' : <>Get My Reel Concept <ArrowRight className="bbr-cta-arrow" /></>}
-            </button>
-          </form>
+          <div className="bbr-form">
+            <ReelForm source="form" />
+          </div>
         </div>
       </section>
 
@@ -745,57 +769,8 @@ export default function BrandReelsPage() {
         <div className="bbr-modal" role="dialog" aria-modal="true" aria-labelledby="bbr-modal-title" onClick={() => setModalOpen(false)}>
           <div className="bbr-modal-card" onClick={(e) => e.stopPropagation()}>
             <button className="bbr-modal-close" onClick={() => setModalOpen(false)} aria-label="Close"><IconClose /></button>
-            {quickDone ? (
-              <div className="bbr-modal-done">
-                <span className="bbr-modal-done-icon"><IconCheck /></span>
-                <h3>Got it{quick.name ? `, ${quick.name.trim().split(' ')[0]}` : ''}.</h3>
-                <p>We&apos;ll reach out on WhatsApp shortly to start your reel.</p>
-                <button className="bbr-cta-btn" onClick={() => setModalOpen(false)}>Done</button>
-              </div>
-            ) : (
-              <form onSubmit={handleQuickSubmit} noValidate>
-                <h3 id="bbr-modal-title">Start your reel</h3>
-                <p className="bbr-modal-sub">Leave your number. We&apos;ll WhatsApp you to get your brief.</p>
-                <div className="bbr-modal-lengths" role="radiogroup" aria-label="Reel length">
-                  {['30s', '60s', 'Custom'].map((l) => (
-                    <button
-                      type="button"
-                      key={l}
-                      role="radio"
-                      aria-checked={quick.videoLength === l}
-                      className={`bbr-modal-length ${quick.videoLength === l ? 'bbr-modal-length-on' : ''}`}
-                      onClick={() => { setQuick({ ...quick, videoLength: l }); setQuickErr(''); }}
-                    >
-                      {l === 'Custom' ? 'Custom' : `${l} reel`}
-                    </button>
-                  ))}
-                </div>
-                <input
-                  ref={quickNameRef}
-                  className="bbr-modal-input"
-                  type="text"
-                  placeholder="Your name"
-                  aria-label="Your name"
-                  value={quick.name}
-                  onChange={(e) => { setQuick({ ...quick, name: e.target.value }); setQuickErr(''); }}
-                />
-                <div className="bbr-modal-phone">
-                  <span>+91</span>
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    placeholder="WhatsApp number"
-                    aria-label="WhatsApp number"
-                    value={quick.phone}
-                    onChange={(e) => { setQuick({ ...quick, phone: e.target.value }); setQuickErr(''); }}
-                  />
-                </div>
-                {quickErr && <em className="bbr-error">{quickErr}</em>}
-                <button type="submit" className="bbr-cta-btn bbr-submit">
-                  Start My Reel <ArrowRight className="bbr-cta-arrow" />
-                </button>
-              </form>
-            )}
+            <h3 id="bbr-modal-title" className="bbr-modal-title">Start your reel</h3>
+            <ReelForm key={modalKey} source="popup" initialLength={modalLength} onDone={() => setModalOpen(false)} />
           </div>
         </div>
       )}
