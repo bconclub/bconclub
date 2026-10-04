@@ -1407,44 +1407,37 @@
   .bbr-player-frame { height: auto; width: 100%; max-height: 74vh; }
 }
 
-/* ── "NOT A TOOL" STAMP ───────────────────────────────────────── */
-.bbr-h-top { position: relative; }
-.bbr-stamp {
-  position: absolute;
-  top: -0.75em;
-  right: -1.45em;
-  width: 118px;
-  height: 118px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  background: #CDFC2E;
-  color: #000;
-  clip-path: polygon(50% 0%, 61% 11%, 75% 6%, 79% 21%, 94% 25%, 89% 39%, 100% 50%, 89% 61%, 94% 75%, 79% 79%, 75% 94%, 61% 89%, 50% 100%, 39% 89%, 25% 94%, 21% 79%, 6% 75%, 11% 61%, 0% 50%, 11% 39%, 6% 25%, 21% 21%, 25% 6%, 39% 11%);
-  text-transform: uppercase;
-  letter-spacing: 0;
-  line-height: 1;
-  transform: rotate(12deg) scale(0);
-  animation: bbrStamp 0.5s 1.25s cubic-bezier(0.3, 1.6, 0.5, 1) forwards;
-  z-index: 2;
-}
-.bbr-stamp span { font-size: 11px; font-weight: 800; letter-spacing: 1px; }
-.bbr-stamp b { font-size: 17px; font-weight: 900; text-align: center; line-height: 0.95; }
-@keyframes bbrStamp { to { transform: rotate(12deg) scale(1); } }
 .bbr-modal-card:focus { outline: none; }
 .bbr-rf-opt:focus { outline: none; }
 .bbr-rf-opt:focus-visible { outline: 2px solid #CDFC2E; outline-offset: 2px; }
-@media (max-width: 960px) {
-  .bbr-stamp { right: -1.2em; top: -1em; width: 96px; height: 96px; }
-  .bbr-stamp span { font-size: 9px; }
-  .bbr-stamp b { font-size: 14px; }
-}
-@media (max-width: 640px) {
-  .bbr-stamp { right: -46px; top: -44px; width: 74px; height: 74px; }
-  .bbr-stamp span { font-size: 7.5px; }
-  .bbr-stamp b { font-size: 11.5px; }
-}
 
-.bbr-h-top > .bbr-stamp { display: flex; white-space: normal; }
+/* Popup + player sit above the floating WhatsApp / PROXe bubble */
+.bbr-modal,
+.bbr-player { z-index: 2147483640; }
+
+/* Phones: the popup is a bottom sheet */
+@media (max-width: 640px) {
+  .bbr-modal { align-items: flex-end; padding: 0; }
+  .bbr-modal-card {
+    max-width: none;
+    border-radius: 22px 22px 0 0;
+    border-bottom: none;
+    padding: 18px 18px calc(22px + env(safe-area-inset-bottom));
+    animation: bbrSheet 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .bbr-modal-card::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 14px;
+    border-radius: 4px;
+    background: #333;
+  }
+  .bbr-modal-close { top: 22px; }
+}
+@keyframes bbrSheet { from { transform: translateY(100%); } }
+
+/* Hide the floating WhatsApp + PROXe bubble while the popup or player is open */
+body.bbr-overlay-open .proxe-whatsapp-button,
+body.bbr-overlay-open iframe[src*="proxe.bconclub.com"] { visibility: hidden !important; }
