@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 import { WhatsAppIcon } from '@/components/shared/Icons';
@@ -26,6 +27,23 @@ export default function ProxeWidget() {
   );
   const showWhatsApp = Boolean(whatsAppRoute);
 
+  // The PROXe bubble iframe uses the max z-index and its transparent top part
+  // overlaps the WhatsApp button, swallowing taps. Render WhatsApp in its own
+  // layer with the same z-index and keep that layer after the iframe in the
+  // DOM, so it paints on top and receives clicks.
+  const [waLayer, setWaLayer] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    if (shouldHide || !showWhatsApp) return;
+    const layer = document.createElement('div');
+    layer.className = 'proxe-whatsapp-layer';
+    document.body.appendChild(layer);
+    setWaLayer(layer);
+    return () => {
+      layer.remove();
+      setWaLayer(null);
+    };
+  }, [shouldHide, showWhatsApp]);
+
   useEffect(() => {
     if (shouldHide || !showWhatsApp) return;
 
@@ -33,10 +51,16 @@ export default function ProxeWidget() {
       const whatsapp = document.querySelector<HTMLElement>('.proxe-whatsapp-button');
       if (!whatsapp) return;
 
+      // Keep the WhatsApp layer after the PROXe iframe (injected later)
+      const layer = whatsapp.parentElement;
+      if (layer?.classList.contains('proxe-whatsapp-layer') && layer.nextElementSibling) {
+        document.body.appendChild(layer);
+      }
+
       const isMobile = window.innerWidth <= 640;
       const right = isMobile ? 18 : 24;
       const bottom = isMobile ? 18 : 24;
-      const gap = isMobile ? 24 : 22;
+      const gap = 12;
 
       const proxeElements = Array.from(document.body.querySelectorAll<HTMLElement>('iframe, [id*="proxe" i], [class*="proxe" i]'))
         .filter((element) => {
@@ -82,16 +106,17 @@ export default function ProxeWidget() {
         const beaconRect = beacon.getBoundingClientRect();
         const whatsappRect = whatsapp.getBoundingClientRect();
         const whatsappLeft = beaconRect.left + ((beaconRect.width - whatsappRect.width) / 2);
+        // The visible bubble is ~48px, centred in its frame with equal padding
+        // on the sides and bottom; dock WhatsApp a fixed gap above it.
+        const bubbleSize = Math.min(48, beaconRect.width);
+        const framePad = Math.max(0, (beaconRect.width - bubbleSize) / 2);
+        const bubbleTopFromBottom = (window.innerHeight - beaconRect.bottom) + framePad + bubbleSize;
 
         whatsapp.style.setProperty('opacity', '1');
         whatsapp.style.setProperty('pointer-events', 'auto');
         whatsapp.style.setProperty('left', `${Math.round(whatsappLeft)}px`);
         whatsapp.style.setProperty('right', 'auto');
-        // The visible bubble sits at the bottom of its frame and is about as
-        // tall as the frame is wide, so stack above that, not the whole frame.
-        const bubbleHeight = Math.min(beaconRect.height, beaconRect.width);
-        const beaconBottom = window.innerHeight - beaconRect.bottom;
-        whatsapp.style.setProperty('bottom', `${Math.round(beaconBottom + bubbleHeight + gap)}px`);
+        whatsapp.style.setProperty('bottom', `${Math.round(bubbleTopFromBottom + gap)}px`);
         return;
       }
 
@@ -127,7 +152,7 @@ export default function ProxeWidget() {
         src="https://proxe.bconclub.com/api/widget/embed.js"
         strategy="afterInteractive"
       />
-      {showWhatsApp && (
+      {showWhatsApp && waLayer && createPortal(
         <a
           className="proxe-whatsapp-button"
           href={whatsAppRoute ? WHATSAPP_PAGES[whatsAppRoute] : undefined}
@@ -138,7 +163,8 @@ export default function ProxeWidget() {
           onClick={handleWhatsAppClick}
         >
           <WhatsAppIcon size={32} />
-        </a>
+        </a>,
+        waLayer
       )}
     </>
   );

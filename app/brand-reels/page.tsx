@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { getMergedUTMParams } from '@/lib/tracking/utm';
-import { WhatsAppIcon } from '@/components/shared/Icons';
 import './page.css';
 
 /* ── Vector icons (no emoji) ─────────────────────────────────── */
@@ -81,7 +80,6 @@ const IconClose = () => (
   </svg>
 );
 
-const WHATSAPP_URL = 'https://wa.me/6360079756?text=Hi%2C%20I%20want%20to%20know%20more%20about%20BCON%20Brand%20Reels.';
 
 /* ── Reel wall: short, muted, web-encoded loops in /public/brand-reels ── */
 // `full` is the full-length version with sound, opened in the player on tap
@@ -533,16 +531,6 @@ export default function BrandReelsPage() {
             <img src="/BCON White logo.webp" alt="BCON" width={106} height={40} />
           </a>
           <div className="bbr-header-actions">
-            <a
-              className="bbr-wa-btn"
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Chat with us on WhatsApp"
-              onClick={() => pushEvent({ event: 'whatsapp_click', source: 'brand_reels_header' })}
-            >
-              <WhatsAppIcon size={20} />
-            </a>
             <button className="bbr-header-cta" onClick={() => openModal('', 'header')} aria-label="Get your reel">
               <ArrowRight />
             </button>
