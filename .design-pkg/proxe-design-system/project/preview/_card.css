@@ -1,0 +1,67 @@
+/* Shared shell for every preview card. Cards render on the PROXe ground:
+   electric violet + film grain + bottom-right vignette. */
+
+@import url("../colors_and_type.css");
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg-page);
+  min-height: 100vh;
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  position: relative;
+  isolation: isolate;
+}
+
+/* vignette layer */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: var(--bg-vignette);
+}
+/* grain layer */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: var(--bg-grain-url);
+  background-size: 256px 256px;
+  background-repeat: repeat;
+  opacity: var(--bg-grain-alpha);
+  mix-blend-mode: overlay;
+}
+body > * { position: relative; z-index: 1; }
+
+.card {
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card--center { align-items: center; justify-content: center; }
+
+.row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+
+.swatch { display: flex; flex-direction: column; gap: 6px; }
+.swatch__chip {
+  width: 100%;
+  height: 64px;
+  border-radius: 14px;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.30);
+}
+.swatch__name { font-size: 12px; font-weight: 500; color: var(--fg-1); font-family: var(--font-sans); }
+.swatch__hex { font-family: var(--font-mono); font-size: 11px; color: var(--fg-3); letter-spacing: 0.02em; }
+
+/* Default card surface on violet bg: thin frosted overlay */
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 18px 40px rgba(16, 4, 66, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  border-radius: var(--r-2xl);
+  padding: 20px;
+}

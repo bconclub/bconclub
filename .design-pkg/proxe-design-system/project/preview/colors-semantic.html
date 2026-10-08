@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Semantic Roles</title>
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 24px 32px; gap: 12px; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--font-sans); font-size: 13px; }
+  td { padding: 8px 10px; vertical-align: middle; border-bottom: 1px solid var(--border-faint); }
+  td:first-child { width: 56px; }
+  .dot { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border-soft); }
+  .name { color: var(--fg-1); font-weight: 600; }
+  .var { font-family: var(--font-mono); font-size: 11px; color: var(--fg-4); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <table>
+      <tr><td><div class="dot" style="background:#4B1FE5"></div></td><td class="name">Background</td><td class="var">--color-bg → --bg-page</td><td style="color:var(--fg-3)">Electric violet page</td></tr>
+      <tr><td><div class="dot" style="background:linear-gradient(160deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04))"></div></td><td class="name">Surface</td><td class="var">--color-surface (frosted)</td><td style="color:var(--fg-3)">Cards, panels</td></tr>
+      <tr><td><div class="dot" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08)"></div></td><td class="name">Foreground</td><td class="var">--color-fg → #FFFFFF</td><td style="color:var(--fg-3)">All ink (4 alpha steps)</td></tr>
+      <tr><td><div class="dot" style="background:#4B1FE5"></div></td><td class="name">Accent</td><td class="var">--color-accent → #4B1FE5</td><td style="color:var(--fg-3)">CTAs, focus</td></tr>
+      <tr><td><div class="dot" style="background:#10B981"></div></td><td class="name">Success</td><td class="var">--color-success → #10B981</td><td style="color:var(--fg-3)">Booked / confirmed</td></tr>
+      <tr><td><div class="dot" style="background:#FACC15"></div></td><td class="name">Warning</td><td class="var">--color-warning → #FACC15</td><td style="color:var(--fg-3)">Pending / soft alert</td></tr>
+      <tr><td><div class="dot" style="background:#EF4444"></div></td><td class="name">Danger</td><td class="var">--color-danger → #EF4444</td><td style="color:var(--fg-3)">Errors, destructive</td></tr>
+    </table>
+  </div>
+</body>
+</html>

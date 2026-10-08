@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Chat Bubbles</title>
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 28px 32px; justify-content: center; }
+  .conv { max-width: 540px; display: flex; flex-direction: column; gap: 12px; margin: 0 auto; }
+  .b {
+    padding: 12px 16px; border-radius: 18px; font-family: var(--font-sans);
+    font-size: 14px; line-height: 1.5; max-width: 80%;
+  }
+  .b--ai { align-self: flex-start;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(16,4,66,0.30);
+    border-bottom-left-radius: 6px;
+  }
+  .b--user { align-self: flex-end;
+    background: #FFFFFF;
+    border: 1px solid rgba(255,255,255,0.30);
+    color: #0A0A0A;
+    box-shadow: 0 8px 24px rgba(16,4,66,0.25);
+    border-bottom-right-radius: 6px;
+  }
+  .quick { display: flex; gap: 8px; flex-wrap: wrap; align-self: flex-start; margin-top: 4px; }
+  .pill { padding: 7px 14px; border-radius: 999px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22); color: #fff; font-size: 12px; cursor: pointer; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="conv">
+      <div class="b b--ai">Hey 👋 I'm PROXe. What brings you here today?</div>
+      <div class="b b--user">Looking for a way to handle WhatsApp leads after hours.</div>
+      <div class="b b--ai">Got it — Voice + WhatsApp PROXe handles that. Want to see a 2-min demo or jump on a call?</div>
+      <div class="quick">
+        <button class="pill">Book a Demo</button>
+        <button class="pill">Schedule a Call</button>
+        <button class="pill">Pricing</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

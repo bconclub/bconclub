@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Buttons</title>
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 28px 32px; justify-content: center; gap: 18px; }
+  .row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .lab { font-family: var(--font-mono); font-size: 10px; color: var(--fg-3); width: 80px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* PRIMARY — white pill on violet, with black knob */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 8px 6px 22px; border-radius: 999px;
+    background: #FFFFFF; color: #0A0A0A;
+    font-family: var(--font-sans); font-size: 14px; font-weight: 500;
+    border: none; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(16, 4, 66, 0.35);
+    transition: transform 150ms cubic-bezier(.25,.46,.45,.94);
+  }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-primary__knob { width: 28px; height: 28px; border-radius: 50%; background: #0A0A0A; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; }
+
+  /* DEPLOY — header pill, lavender on violet */
+  .btn-deploy {
+    padding: 8px 18px; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16); color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    font-family: var(--font-sans); font-size: 13px; font-weight: 500; cursor: pointer;
+    backdrop-filter: blur(12px);
+  }
+  .btn-deploy:hover { background: rgba(255, 255, 255, 0.24); }
+
+  /* GHOST — outline only */
+  .btn-ghost {
+    padding: 10px 22px; font-size: 14px; font-weight: 500; color: #fff;
+    background: transparent; border: 1px solid rgba(255, 255, 255, 0.40);
+    border-radius: 8px; cursor: pointer; font-family: var(--font-sans);
+  }
+
+  /* TEXT — quiet inline link */
+  .btn-text {
+    background: none; border: none; color: #fff; font-size: 15px; font-weight: 500; cursor: pointer; font-family: var(--font-sans);
+    display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; opacity: 0.92;
+  }
+  .btn-text:hover { opacity: 1; }
+
+  /* QUICK PILL — small lavender pill */
+  .btn-pill {
+    padding: 7px 14px; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255,255,255,0.22);
+    color: #fff; font-size: 13px; font-family: var(--font-sans); cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="row"><span class="lab">Primary</span><button class="btn-primary">What's PROXe? <span class="btn-primary__knob">→</span></button><button class="btn-primary">Book a Demo <span class="btn-primary__knob">→</span></button></div>
+    <div class="row"><span class="lab">Deploy</span><button class="btn-deploy">Deploy PROXe</button></div>
+    <div class="row"><span class="lab">Ghost</span><button class="btn-ghost">Learn more</button><button class="btn-ghost">Features</button></div>
+    <div class="row"><span class="lab">Text</span><button class="btn-text">See pricing →</button><button class="btn-text">Schedule a Call →</button></div>
+    <div class="row"><span class="lab">Quick</span><button class="btn-pill">Pricing</button><button class="btn-pill">Book a Demo</button><button class="btn-pill">What's PROXe?</button></div>
+  </div>
+</body>
+</html>

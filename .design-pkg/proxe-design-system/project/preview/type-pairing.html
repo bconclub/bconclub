@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Type Pairing</title>
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 28px 36px; justify-content: center; gap: 14px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+  .name { font-family: var(--font-mono); font-size: 10px; color: var(--fg-4); letter-spacing: 0.08em; }
+  .demo-serif { font-family: var(--font-display); font-size: 56px; line-height: 1; color: var(--fg-1); }
+  .demo-sans  { font-family: var(--font-sans); font-size: 14px; color: var(--fg-3); line-height: 1.6; font-weight: 300; }
+  .ampersand { font-family: var(--font-display); font-style: italic; font-size: 96px; color: var(--proxe-violet-bright); line-height: 1; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="pair">
+      <div>
+        <span class="name">DISPLAY · INSTRUMENT SERIF</span>
+        <div class="demo-serif">Aa Bb Cc</div>
+        <div class="demo-serif" style="font-style:italic;color:var(--fg-3);font-size:36px">italic for accent</div>
+      </div>
+      <div>
+        <span class="name">UI · EXO 2</span>
+        <div class="demo-sans" style="font-weight:600;font-size:18px;color:var(--fg-1)">100 200 300 400 500 600 700 800 900</div>
+        <div class="demo-sans" style="margin-top:8px">A wide-set geometric sans pairs with the high-contrast serif and inherits PROXe's "futuristic but human" voice.</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:6px"><span class="ampersand">&amp;</span></div>
+  </div>
+</body>
+</html>

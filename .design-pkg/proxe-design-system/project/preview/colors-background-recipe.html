@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PROXe — Background Recipe</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<link rel="stylesheet" href="_card.css" />
+<style>
+  .card { padding: 28px 32px; }
+  .title-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 24px; margin-bottom: 6px;
+  }
+  .title-row h2 {
+    font-family: var(--font-display); font-weight: 400;
+    font-size: 30px; letter-spacing: -0.01em; margin: 0; color: #0E0526;
+  }
+  .lede {
+    font-family: var(--font-sans); font-size: 13px; line-height: 1.55;
+    color: rgba(14, 5, 38, 0.66); max-width: 680px; margin: 0 0 22px;
+  }
+
+  /* layer stack — each tile demos one isolated layer */
+  .stack {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  }
+  .layer {
+    aspect-ratio: 4/3;
+    border-radius: 16px;
+    border: 1px solid rgba(14,5,38,0.10);
+    padding: 14px 16px;
+    color: #fff;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+    isolation: isolate;
+  }
+  .lab {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; opacity: 0.85; z-index: 3;
+  }
+  .ti {
+    font-family: var(--font-display); font-weight: 400; font-size: 22px;
+    line-height: 1.1; letter-spacing: -0.01em; z-index: 3;
+  }
+
+  /* L1 — flat fallback plate */
+  .l-flat   { background: #4B1FE5; }
+
+  /* L2 — gradient only */
+  .l-grad   { background: var(--bg-hero-gradient); }
+
+  /* L3 — gradient + vignette */
+  .l-vig    { background: var(--bg-hero-gradient); }
+  .l-vig::before {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: var(--bg-vignette);
+  }
+
+  /* L4 — final: gradient + vignette + grain */
+  .l-final { background: var(--bg-hero-gradient); }
+  .l-final::before {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: var(--bg-vignette);
+  }
+  .l-final::after {
+    content: ""; position: absolute; inset: 0; z-index: 2;
+    background-image: var(--bg-grain-url);
+    background-size: var(--bg-grain-tile) var(--bg-grain-tile);
+    background-repeat: repeat;
+    opacity: var(--bg-grain-alpha);
+    mix-blend-mode: var(--bg-grain-blend);
+  }
+
+  /* side-by-side: our final vs the live screenshot */
+  .compare {
+    margin-top: 22px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  .compare > figure {
+    margin: 0; border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(14,5,38,0.10);
+    aspect-ratio: 1729 / 813; position: relative; isolation: isolate;
+  }
+  .compare > figure.live {
+    background-image: url("../assets/imagery/hero-gradient-reference.png");
+    background-size: cover; background-position: center;
+  }
+  .compare > figure.ours {
+    background: var(--bg-hero-gradient);
+  }
+  .compare > figure.ours::before {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: var(--bg-vignette);
+  }
+  .compare > figure.ours::after {
+    content: ""; position: absolute; inset: 0; z-index: 2;
+    background-image: var(--bg-grain-url);
+    background-size: var(--bg-grain-tile) var(--bg-grain-tile);
+    opacity: var(--bg-grain-alpha);
+    mix-blend-mode: var(--bg-grain-blend);
+  }
+  .compare figcaption {
+    position: absolute; left: 14px; top: 12px; z-index: 3;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: rgba(255,255,255,0.85);
+  }
+
+  /* recipe printout */
+  .recipe {
+    margin-top: 22px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    background: rgba(14,5,38,0.04);
+    border: 1px solid rgba(14,5,38,0.10);
+    font-family: var(--font-mono); font-size: 11.5px; line-height: 1.75;
+    color: rgba(14,5,38,0.78);
+    white-space: pre-wrap;
+  }
+  .recipe b { color: #0E0526; font-weight: 600; }
+  .recipe .v { color: #4B1FE5; }
+
+  /* stop swatches strip */
+  .stops {
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    gap: 8px; margin-top: 20px;
+  }
+  .stop {
+    border-radius: 10px; padding: 12px 12px 14px;
+    color: #fff; font-family: var(--font-mono); font-size: 10px;
+    line-height: 1.4;
+    border: 1px solid rgba(255,255,255,0.10);
+    aspect-ratio: 3/2;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .stop .pos { opacity: 0.75; letter-spacing: 0.06em; text-transform: uppercase; }
+  .stop .hex { font-size: 12px; letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="title-row">
+      <h2>Page Background — Hero Gradient + Vignette + Grain</h2>
+    </div>
+    <p class="lede">
+      The PROXe page is a single large radial gradient sampled from the live site,
+      anchored top-left at <b>#7916FF</b> and falling all the way to <b>#100442</b> in
+      the bottom-right. A second radial deepens the BR corner; a 220&nbsp;px noise
+      tile at 16% overlay supplies the film grain. Apply with <code>.px-page-bg</code>.
+    </p>
+
+    <!-- stop swatches -->
+    <div class="stops">
+      <div class="stop" style="background:#7916FF"><span class="pos">0% · hot-spot</span><span class="hex">#7916FF</span></div>
+      <div class="stop" style="background:#6B11F5"><span class="pos">18%</span><span class="hex">#6B11F5</span></div>
+      <div class="stop" style="background:#4B1FE5"><span class="pos">42% · mid</span><span class="hex">#4B1FE5</span></div>
+      <div class="stop" style="background:#2A0EAF"><span class="pos">65%</span><span class="hex">#2A0EAF</span></div>
+      <div class="stop" style="background:#1A0570"><span class="pos">82%</span><span class="hex">#1A0570</span></div>
+      <div class="stop" style="background:#100442"><span class="pos">100% · anchor</span><span class="hex">#100442</span></div>
+    </div>
+
+    <!-- layer stack -->
+    <div class="stack" style="margin-top: 20px;">
+      <div class="layer l-flat">
+        <span class="lab">Layer 0 · fallback</span>
+        <span class="ti">Flat<br/>#4B1FE5</span>
+      </div>
+      <div class="layer l-grad">
+        <span class="lab">Layer 1 · gradient</span>
+        <span class="ti">Hero<br/>Radial</span>
+      </div>
+      <div class="layer l-vig">
+        <span class="lab">Layer 2 · + vignette</span>
+        <span class="ti">BR<br/>Vignette</span>
+      </div>
+      <div class="layer l-final">
+        <span class="lab">Layer 3 · + grain</span>
+        <span class="ti">Final<br/>Page</span>
+      </div>
+    </div>
+
+    <!-- side-by-side -->
+    <div class="compare">
+      <figure class="live"><figcaption>Reference · live site</figcaption></figure>
+      <figure class="ours"><figcaption>Ours · CSS recipe</figcaption></figure>
+    </div>
+
+    <pre class="recipe"><b>--bg-hero-gradient:</b> radial-gradient(ellipse 130% 110% at 22% 28%,
+    <span class="v">#7916FF</span> 0%, <span class="v">#6B11F5</span> 18%, <span class="v">#4B1FE5</span> 42%,
+    <span class="v">#2A0EAF</span> 65%, <span class="v">#1A0570</span> 82%, <span class="v">#100442</span> 100%);
+
+<b>--bg-vignette:</b> radial-gradient(ellipse 60% 70% at 95% 100%,
+    rgba(7,0,33,0.70) 0%, rgba(16,4,66,0.45) 30%, transparent 70%);
+
+<b>--bg-grain-url:</b>   url("assets/imagery/grain.png");
+<b>--bg-grain-tile:</b>  220px;
+<b>--bg-grain-alpha:</b> 0.16;
+<b>--bg-grain-blend:</b> overlay;</pre>
+  </div>
+</body>
+</html>
