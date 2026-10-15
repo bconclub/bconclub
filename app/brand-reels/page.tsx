@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { getMergedUTMParams } from '@/lib/tracking/utm';
+import { WEEKEND_DEALS, type Deal } from '@/lib/payments/deals';
 import './page.css';
 
 /* ── Vector icons (no emoji) ─────────────────────────────────── */
@@ -390,6 +391,62 @@ function ReelForm({ source, initialLength = '', onDone }: { source: string; init
   );
 }
 
+/* ── Pay for a weekend deal: details → Dodo Payments hosted checkout ── */
+function PayForm({ deal }: { deal: Deal }) {
+  const [f, setF] = useState({ name: '', email: '', phone: '', brand: '' });
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => { setF({ ...f, [k]: e.target.value }); setErr(''); };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!f.name.trim()) { setErr('Please enter your name'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) { setErr('Please enter a valid email'); return; }
+    if (f.phone.replace(/\D/g, '').slice(-10).length !== 10) { setErr('Please enter a valid 10 digit WhatsApp number'); return; }
+    setBusy(true);
+    setErr('');
+    pushEvent({ event: 'begin_checkout', deal: deal.id, page: 'brand-reels' });
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'InitiateCheckout', { content_name: deal.name, currency: 'INR', value: Number(deal.price.replace(/[^\d]/g, '')) });
+    }
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dealId: deal.id, ...f }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.checkout_url) throw new Error(data.error || 'Could not start payment. Please try again.');
+      window.location.href = data.checkout_url;
+    } catch (e2) {
+      setErr(e2 instanceof Error ? e2.message : 'Could not start payment. Please try again.');
+      setBusy(false);
+    }
+  };
+
+  return (
+    <form className="bbr-rf bbr-rf-step" onSubmit={submit} noValidate>
+      <div className="bbr-pay-head">
+        <span className="bbr-deal-tag">Weekend deal</span>
+        <h3>{deal.name}</h3>
+        <div className="bbr-price">{deal.compareAt && <s>{deal.compareAt}</s>} {deal.price}</div>
+      </div>
+      <input className="bbr-rf-input" type="text" placeholder="Your name" aria-label="Your name" autoFocus value={f.name} onChange={set('name')} />
+      <input className="bbr-rf-input" type="email" placeholder="Email for your receipt" aria-label="Email" value={f.email} onChange={set('email')} />
+      <div className="bbr-rf-phone">
+        <span>+91</span>
+        <input type="tel" inputMode="numeric" placeholder="WhatsApp number" aria-label="WhatsApp number" value={f.phone} onChange={set('phone')} />
+      </div>
+      <input className="bbr-rf-input" type="text" placeholder="Brand name (optional)" aria-label="Brand name" value={f.brand} onChange={set('brand')} />
+      {err && <em className="bbr-error">{err}</em>}
+      <button type="submit" className="bbr-cta-btn bbr-submit" disabled={busy}>
+        {busy ? 'Opening secure checkout…' : <>Pay {deal.price} <ArrowRight className="bbr-cta-arrow" /></>}
+      </button>
+      <p className="bbr-pay-note">Secure payment by Dodo Payments. We take your brief on WhatsApp right after.</p>
+    </form>
+  );
+}
+
 export default function BrandReelsPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const wallRef = useRef<HTMLDivElement>(null);
@@ -403,6 +460,7 @@ export default function BrandReelsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalLength, setModalLength] = useState('');
   const [modalKey, setModalKey] = useState(0);
+  const [modalDeal, setModalDeal] = useState<Deal | null>(null);
 
   // Reveal [data-reveal] elements as they enter view. Uses a data attribute,
   // not a class, so React re-renders of className never undo the reveal.
@@ -499,10 +557,18 @@ export default function BrandReelsPage() {
   };
 
   const openModal = (videoLength = '', source = 'cta') => {
+    setModalDeal(null);
     setModalLength(videoLength);
     setModalKey((k) => k + 1); // fresh form each time it opens
     setModalOpen(true);
     pushEvent({ event: 'brand_reels_modal_open', source });
+  };
+
+  const openPay = (deal: Deal) => {
+    setModalDeal(deal);
+    setModalKey((k) => k + 1);
+    setModalOpen(true);
+    pushEvent({ event: 'brand_reels_pay_open', deal: deal.id });
   };
 
   // "What you get" carousel: moves only when the visitor swipes, drags or taps an arrow
@@ -722,11 +788,14 @@ export default function BrandReelsPage() {
           </div>
 
           <div className="bbr-grid bbr-grid-3">
-            {tiers.map((c) => (
+            {tiers.map((c) => {
+              const deal = WEEKEND_DEALS.find((d) => d.len === c.len);
+              return (
               <div className="bbr-cut" key={c.len} data-reveal>
+                {deal && <span className="bbr-deal-tag">Weekend deal</span>}
                 <div className="bbr-cut-len">{c.len}</div>
                 <h3>{c.name}</h3>
-                <div className="bbr-price">{c.price} <span>{c.per}</span></div>
+                <div className="bbr-price">{deal?.compareAt && <s>{deal.compareAt}</s>} {deal?.price || c.price} <span>{c.per}</span></div>
                 <div className="bbr-cut-speed">
                   <IconClock /> {c.speed ? <span>Delivered in <b>{c.speed}</b> once the script is final</span> : <span>Delivery time agreed with you</span>}
                 </div>
@@ -736,11 +805,17 @@ export default function BrandReelsPage() {
                     <li key={item}><IconCheck /> {item}</li>
                   ))}
                 </ul>
+                {deal && (
+                  <button className="bbr-cut-btn bbr-pay-btn" onClick={() => openPay(deal)}>
+                    Pay now <ArrowRight className="bbr-cta-arrow" />
+                  </button>
+                )}
                 <button className="bbr-cut-btn" onClick={() => openModal(c.len, `pricing_${c.len}`)}>
-                  Choose {c.len} <ArrowRight className="bbr-cta-arrow" />
+                  {deal ? 'Talk to us first' : `Choose ${c.len}`} <ArrowRight className="bbr-cta-arrow" />
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -853,7 +928,9 @@ export default function BrandReelsPage() {
         <div className="bbr-modal" role="dialog" aria-modal="true" aria-label="Get your reel" onClick={() => setModalOpen(false)}>
           <div className="bbr-modal-card" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
             <button className="bbr-modal-close" onClick={() => setModalOpen(false)} aria-label="Close"><IconClose /></button>
-            <ReelForm key={modalKey} source="popup" initialLength={modalLength} onDone={() => setModalOpen(false)} />
+            {modalDeal
+              ? <PayForm key={modalKey} deal={modalDeal} />
+              : <ReelForm key={modalKey} source="popup" initialLength={modalLength} onDone={() => setModalOpen(false)} />}
           </div>
         </div>
       )}

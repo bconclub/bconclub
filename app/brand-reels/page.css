@@ -1441,3 +1441,27 @@
 /* Hide the floating WhatsApp + PROXe bubble while the popup or player is open */
 body.bbr-overlay-open .proxe-whatsapp-button,
 body.bbr-overlay-open iframe[src*="proxe.bconclub.com"] { visibility: hidden !important; }
+
+/* ── WEEKEND DEAL + PAY (Dodo Payments) ───────────────────────── */
+.bbr-deal-tag {
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #CDFC2E;
+  color: #000;
+  font-family: 'Anybody', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.bbr-price s { color: #666; font-weight: 500; margin-right: 6px; }
+.bbr-pay-btn { background: #CDFC2E; color: #000; }
+.bbr-pay-btn:hover { background: #fff; border-color: #fff; }
+.bbr-pay-btn + .bbr-cut-btn { margin-top: 10px; }
+.bbr-pay-head { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.bbr-pay-head h3 { margin: 0; }
+.bbr-pay-note { margin: 4px 0 0; font-size: 12px; color: #777; text-align: center; }
+.bbr-submit:disabled { opacity: 0.6; cursor: wait; }
