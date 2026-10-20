@@ -805,14 +805,15 @@ export default function BrandReelsPage() {
                     <li key={item}><IconCheck /> {item}</li>
                   ))}
                 </ul>
-                {deal && (
+                {deal ? (
                   <button className="bbr-cut-btn bbr-pay-btn" onClick={() => openPay(deal)}>
-                    Pay now <ArrowRight className="bbr-cta-arrow" />
+                    Get this <ArrowRight className="bbr-cta-arrow" />
+                  </button>
+                ) : (
+                  <button className="bbr-cut-btn" onClick={() => openModal(c.len, `pricing_${c.len}`)}>
+                    Choose {c.len} <ArrowRight className="bbr-cta-arrow" />
                   </button>
                 )}
-                <button className="bbr-cut-btn" onClick={() => openModal(c.len, `pricing_${c.len}`)}>
-                  {deal ? 'Talk to us first' : `Choose ${c.len}`} <ArrowRight className="bbr-cta-arrow" />
-                </button>
               </div>
               );
             })}

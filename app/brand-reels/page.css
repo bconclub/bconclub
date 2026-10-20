@@ -1460,7 +1460,6 @@ body.bbr-overlay-open iframe[src*="proxe.bconclub.com"] { visibility: hidden !im
 .bbr-price s { color: #666; font-weight: 500; margin-right: 6px; }
 .bbr-pay-btn { background: #CDFC2E; color: #000; }
 .bbr-pay-btn:hover { background: #fff; border-color: #fff; }
-.bbr-pay-btn + .bbr-cut-btn { margin-top: 10px; }
 .bbr-pay-head { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
 .bbr-pay-head h3 { margin: 0; }
 .bbr-pay-note { margin: 4px 0 0; font-size: 12px; color: #777; text-align: center; }
