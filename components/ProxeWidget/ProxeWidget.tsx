@@ -9,7 +9,7 @@ import './ProxeWidget.css';
 
 // /proxe now lives at goproxe.com (standalone). /proxe-cfs still hides the
 // embed widget so the security/platform page reads cleanly.
-const HIDDEN_ROUTES = ['/proxe-cfs'];
+const HIDDEN_ROUTES = ['/proxe-cfs', '/flight'];
 // Pages that show the floating WhatsApp button above the PROXe bubble,
 // each with its own prefilled message.
 const WHATSAPP_PAGES: Record<string, string> = {
