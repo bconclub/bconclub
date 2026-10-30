@@ -27,6 +27,20 @@ function sampleText(text,count,worldW){
     out[n*3]=(pts[p]-W/2+Math.random()*2)*k;out[n*3+1]=-(pts[p+1]-H/2+Math.random()*2)*k;out[n*3+2]=(Math.random()-.5)*.25}
   return out}
 
+/* Particles form the real BCON mark: the black infinity inside public/bcon-icon.png. */
+function sampleMark(count,worldW,worldH){
+  return new Promise((res,rej)=>{const im=new Image();im.onerror=rej;im.onload=()=>{
+    const W=im.naturalWidth,H=im.naturalHeight,c=document.createElement("canvas");c.width=W;c.height=H;
+    const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(im,0,0);
+    const d=x.getImageData(0,0,W,H).data,pts=[];let a=W,b=H,e=0,f=0;
+    for(let j=0;j<H;j+=2)for(let i=0;i<W;i+=2){const o=(j*W+i)*4;
+      if(d[o+3]>200&&d[o]+d[o+1]+d[o+2]<200){pts.push(i,j);a=Math.min(a,i);e=Math.max(e,i);b=Math.min(b,j);f=Math.max(f,j)}}
+    if(!pts.length)return rej(new Error("empty mark"));
+    const k=Math.min(worldW/(e-a),worldH/(f-b)),mx=(a+e)/2,my=(b+f)/2,out=new Float32Array(count*3);
+    for(let n=0;n<count;n++){const p=Math.floor(Math.random()*pts.length/2)*2;
+      out[n*3]=(pts[p]-mx+Math.random()*2)*k;out[n*3+1]=-(pts[p+1]-my+Math.random()*2)*k;out[n*3+2]=(Math.random()-.5)*.25}
+    res(out)};im.src="/bcon-icon.png"})}
+
 /* Original bassline, synthesized live with Web Audio. No samples or third-party music. */
 const Sound={ctx:null,master:null,an:null,buf:null,filter:null,on:false,timer:null,
   start(){
@@ -170,14 +184,15 @@ const World={active:false,planes:[],zones:[],cache:{},y:0,prev:0,v:0,bass:0,
         w.z-=(ny*ny*2.2+nx*nx*.6)*(12.+abs(v)*55.);
         w.z+=sin(uv.y*3.14159)*abs(v)*14.;
         gl_Position=projectionMatrix*viewMatrix*w;}`;
-    const fs=`varying vec2 vUv;uniform sampler2D uTex;uniform vec2 uScale;uniform float uVel,uA,uHas,uT,uBass;
+    const fs=`varying vec2 vUv;uniform sampler2D uTex;uniform vec2 uScale,uCover;uniform float uVel,uA,uHas,uT,uBass;
       float rnd(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
       void main(){vec2 uv=(vUv-.5)*uScale+.5;float s=abs(uVel)*.007+uBass*.0015+.0003;vec3 c=vec3(.06,.07,.05);
-        if(uHas>.5)c=vec3(texture2D(uTex,uv+vec2(0.,s)).r,texture2D(uTex,uv).g,texture2D(uTex,uv-vec2(0.,s)).b);
+        if(uHas>.5){if(uv.y<0.||uv.y>1.)c=texture2D(uTex,(vUv-.5)*uCover+.5).rgb*.22;
+          else c=vec3(texture2D(uTex,uv+vec2(0.,s)).r,texture2D(uTex,uv).g,texture2D(uTex,uv-vec2(0.,s)).b);}
         c+=(rnd(vUv*900.+uT)-.5)*.045;
         gl_FragColor=vec4(c,uA);}`;
     document.querySelectorAll("[data-src]").forEach(el=>{
-      const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,vertexShader:vs,fragmentShader:fs,uniforms:{uVel:this.U.uVel,uT:this.U.uT,uVh:this.U.uVh,uBass:this.U.uBass,uTex:{value:null},uScale:{value:new THREE.Vector2(1,1)},uA:{value:1},uHas:{value:0}}});
+      const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,vertexShader:vs,fragmentShader:fs,uniforms:{uVel:this.U.uVel,uT:this.U.uT,uVh:this.U.uVh,uBass:this.U.uBass,uTex:{value:null},uScale:{value:new THREE.Vector2(1,1)},uCover:{value:new THREE.Vector2(1,1)},uA:{value:1},uHas:{value:0}}});
       const m=new THREE.Mesh(geo,mat);m.frustumCulled=false;m.visible=false;this.scene.add(m);
       const pl={el,m,src:el.dataset.src,hero:el.classList.contains("ch-hero"),ch:el.dataset.ch,top:0,left:0,w:1,h:1,info:null};
       this.planes.push(pl)});
@@ -195,9 +210,9 @@ const World={active:false,planes:[],zones:[],cache:{},y:0,prev:0,v:0,bass:0,
           c+=sp*.9+lime*uBass*pow(f,3.)*.8;gl_FragColor=vec4(c,1.);}`}));
     this.pearl.frustumCulled=false;this.scene.add(this.pearl);
     this.quad=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,
-      uniforms:{uB:{value:0},uTex:{value:null},uScale:{value:new THREE.Vector2(1,1)},uAsp:{value:1},uT:this.U.uT,uBass:this.U.uBass},
+      uniforms:{uB:{value:0},uTex:{value:null},uScale:{value:new THREE.Vector2(1,1)},uCover:{value:new THREE.Vector2(1,1)},uAsp:{value:1},uT:this.U.uT,uBass:this.U.uBass},
       vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader:`varying vec2 vUv;uniform sampler2D uTex;uniform vec2 uScale;uniform float uB,uAsp,uT,uBass;
+      fragmentShader:`varying vec2 vUv;uniform sampler2D uTex;uniform vec2 uScale,uCover;uniform float uB,uAsp,uT,uBass;
         void main(){vec2 q=(vUv-.5)*vec2(uAsp,1.);float r=length(q),a=atan(q.y,q.x);
           float corner=sqrt(uAsp*uAsp+1.)*.5+.3;
           float R=pow(uB,1.55)*corner;
@@ -211,7 +226,7 @@ const World={active:false,planes:[],zones:[],cache:{},y:0,prev:0,v:0,bass:0,
           vec2 uv=(vUv-.5)*(1.-(1.-uB)*.3)+.5;
           uv=(uv-.5)*uScale+.5;
           float s=.004+rim*.03;
-          vec3 c=vec3(texture2D(uTex,uv+vec2(s,0.)).r,texture2D(uTex,uv).g,texture2D(uTex,uv-vec2(s,0.)).b);
+          vec3 c=(uv.y<0.||uv.y>1.)?texture2D(uTex,(vUv-.5)*uCover+.5).rgb*.22:vec3(texture2D(uTex,uv+vec2(s,0.)).r,texture2D(uTex,uv).g,texture2D(uTex,uv-vec2(s,0.)).b);
           c=c*m+vec3(.80,.99,.18)*(rim*1.1+crack*.9);
           gl_FragColor=vec4(c,clamp(m+crack,0.,1.));}`}));
     this.quad.frustumCulled=false;this.quad.renderOrder=10;this.quad.visible=false;this.scene.add(this.quad);
@@ -221,8 +236,11 @@ const World={active:false,planes:[],zones:[],cache:{},y:0,prev:0,v:0,bass:0,
     const jobs=all.map(s=>this.tex(s).catch(()=>null));
     this.planes.forEach(p=>this.tex(p.src).then(info=>{p.info=info;const u=p.m.material.uniforms;u.uTex.value=info.t;u.uHas.value=1;this.fit(p)}).catch(()=>{}));
     return Promise.race([Promise.all(jobs),new Promise(r=>setTimeout(r,12000))])},
-  fit(p){if(!p.info)return;const pa=p.w/p.h,ta=p.info.w/p.info.h,s=p.m.material.uniforms.uScale.value;
-    if(pa>ta)s.set(1,ta/pa);else s.set(pa/ta,1)},
+  /* Cover by default. A wide film on a portrait screen shows its whole frame, over a dim copy of itself. */
+  fitUv(pa,ta,hero,s,cover){
+    if(pa>ta)cover.set(1,ta/pa);else cover.set(pa/ta,1);
+    if(hero&&pa<1&&pa<ta)s.set(1,ta/pa);else s.copy(cover)},
+  fit(p){if(!p.info)return;const u=p.m.material.uniforms;this.fitUv(p.w/p.h,p.info.w/p.info.h,p.hero,u.uScale.value,u.uCover.value)},
   layout(){
     const vw=innerWidth,vh=innerHeight;this.vw=vw;this.vh=vh;
     this.cam.aspect=vw/vh;this.cam.fov=2*Math.atan(vh/2/800)*180/Math.PI;this.cam.updateProjectionMatrix();this.U.uVh.value=vh;
@@ -262,7 +280,7 @@ const World={active:false,planes:[],zones:[],cache:{},y:0,prev:0,v:0,bass:0,
         if(want&&v.paused){const q=v.play();if(q&&q.catch)q.catch(()=>{})}else if(!want&&!v.paused)v.pause()}});
     const q=this.quad;q.visible=!!(active&&nextHero&&nextHero.info);
     if(q.visible){const u=q.material.uniforms;u.uB.value=b;u.uTex.value=nextHero.info.t;
-      const pa=vw/vh,ta=nextHero.info.w/nextHero.info.h;if(pa>ta)u.uScale.value.set(1,ta/pa);else u.uScale.value.set(pa/ta,1)}
+      this.fitUv(vw/vh,nextHero.info.w/nextHero.info.h,true,u.uScale.value,u.uCover.value)}
     const sy=this.opTop-this.y;this.pearl.visible=sy+this.opH>-vh*.2;
     this.pearl.position.set(0,vh/2-(sy+this.opH/2),-120);
     this.pearl.rotation.y=U.uT.value*.15+this.v*1.2;this.pearl.rotation.x=this.v*.8;
@@ -295,6 +313,7 @@ async function start(){
   g.setAttribute("aScatter",new THREE.BufferAttribute(scatter,3));
   g.setAttribute("aEnd",new THREE.BufferAttribute(end,3));
   g.setAttribute("aSeed",new THREE.BufferAttribute(seed,1));
+  sampleMark(COUNT,textW,2*START*Math.tan(27.5*Math.PI/180)*.62).then(pts=>{home.set(pts);g.attributes.position.needsUpdate=true}).catch(()=>{});
   const U={uBass:{value:0},uTime:{value:0},uMorph:{value:0},uEnd:{value:0},uMouse:{value:new THREE.Vector2(99,99)},uVel:{value:0},uSize:{value:30*dpr*(innerHeight/800)},uMax:{value:13*dpr}};
   const mat=new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
     vertexShader:`
@@ -353,7 +372,7 @@ async function start(){
     x.fillStyle="#f4f6ea";x.textBaseline="middle";x.fillText(n,30,190);
     x.font='500 38px "JetBrains Mono", monospace';x.fillStyle="#cdfc2e";x.fillText(c.join("  /  ").toUpperCase(),34,350);
     const t=new THREE.CanvasTexture(cv);t.anisotropy=4;
-    const pw=small?9:12.5;
+    const pw=small?Math.min(9,visW*.9):12.5;
     const m=new THREE.Mesh(new THREE.PlaneGeometry(pw,pw*460/1400),new THREE.MeshBasicMaterial({map:t,transparent:true,opacity:0,depthWrite:false}));
     const side=i%2?1:-1;
     m.position.set(small?0:side*Math.min(visW*.17,4.2),small?1.2:(i%3-1)*.9,-(i+1)*GAP);
@@ -363,7 +382,7 @@ async function start(){
   const media=[];
   planes.forEach((m,i)=>{const ch=CH.find(c=>c.name===BRANDS[i][0]);if(!ch)return;
     const mm=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,color:0xffffff});
-    const w=small?11:19,mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,w*9/16),mm);
+    const w=small?Math.min(11,visW*.92):19,mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,w*9/16),mm);
     mesh.position.set(m.position.x*.35,m.position.y*.3,m.position.z-2);mesh.renderOrder=-1;scene.add(mesh);
     const item={mesh,info:null};media.push(item);
     World.tex(ch.hero).then(info=>{item.info=info;mm.map=info.t;mm.needsUpdate=true})});
@@ -396,13 +415,13 @@ async function start(){
     const punch=calm?0:U.uBass.value*9;
     camera.fov=55+punch+U.uMorph.value*(1-U.uEnd.value)*12;camera.updateProjectionMatrix();
     streaks.material.opacity=U.uMorph.value*(1-U.uEnd.value)*(.42+U.uBass.value*.55);
-    media.forEach(it=>{const d=camZ-it.mesh.position.z,o=it.info?smooth(40,18,d)*smooth(4,10,d):0;
+    media.forEach(it=>{const d=camZ-it.mesh.position.z,o=it.info?smooth(40,18,d)*smooth(4,10,d)*smooth(0,.4,U.uMorph.value):0;
       it.mesh.material.opacity=o;it.mesh.visible=o>.002;
       if(it.info&&it.info.video){const v=it.info.video;if(o>.002&&v.paused){const q=v.play();if(q&&q.catch)q.catch(()=>{})}else if(o<=.002&&!v.paused&&!World.active)v.pause()}});
     const vh=2*START*Math.tan(27.5*Math.PI/180);
     if(hasMouse)U.uMouse.value.set(mx*vh*camera.aspect/2+cx*1.5,my*vh/2+cy*.9);
     planes.forEach(m=>{const d=camZ-m.position.z;
-      m.material.opacity=smooth(34,15,d)*smooth(1.2,5,d);
+      m.material.opacity=smooth(34,15,d)*smooth(1.2,5,d)*smooth(0,.4,U.uMorph.value);
       m.rotation.y=-m.userData.side*.22+cx*.1;m.rotation.x=cy*.06;
       m.scale.setScalar(1+U.uBass.value*.07);
       m.visible=m.material.opacity>.002});
