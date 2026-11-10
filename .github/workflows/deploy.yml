@@ -78,6 +78,34 @@ jobs:
           echo "branch=$(git branch --show-current || echo 'production')" >> $GITHUB_OUTPUT
           echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
+      # Razorpay keys live as repo secrets and are written into the server's
+      # .env.local before the build, so a key change is one secret + one run.
+      # A secret that is not set leaves the server's value alone. Nothing here
+      # prints a value.
+      - name: Sync Razorpay keys to the server
+        uses: appleboy/ssh-action@v1
+        env:
+          RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
+          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}
+          RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          envs: RAZORPAY_KEY_ID,RAZORPAY_KEY_SECRET,RAZORPAY_WEBHOOK_SECRET
+          script: |
+            f=/var/www/bconclub/.env.local
+            [ -f "$f" ] || exit 0
+            for k in RAZORPAY_KEY_ID RAZORPAY_KEY_SECRET RAZORPAY_WEBHOOK_SECRET; do
+              v="$(printenv "$k" || true)"
+              [ -z "$v" ] && continue
+              grep -v "^$k=" "$f" > "$f.rzp" || true
+              echo "$k=$v" >> "$f.rzp"
+              cat "$f.rzp" > "$f"
+              rm -f "$f.rzp"
+              echo "set $k"
+            done
+
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
