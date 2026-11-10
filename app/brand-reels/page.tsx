@@ -391,11 +391,21 @@ function ReelForm({ source, initialLength = '', onDone }: { source: string; init
   );
 }
 
-/* ── Pay for a weekend deal: details → Dodo Payments hosted checkout ── */
+/* ── Pay for a weekend deal: details → hosted checkout (Razorpay, or Dodo Payments as the fallback) ── */
 function PayForm({ deal }: { deal: Deal }) {
   const [f, setF] = useState({ name: '', email: '', phone: '', brand: '' });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  // Which checkout the server will send the buyer to, for the note below.
+  const [provider, setProvider] = useState('');
+  useEffect(() => {
+    let live = true;
+    fetch('/api/checkout')
+      .then((r) => r.json())
+      .then((d) => { if (live) setProvider(d?.provider === 'razorpay' ? 'Razorpay' : 'Dodo Payments'); })
+      .catch(() => {});
+    return () => { live = false; };
+  }, []);
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => { setF({ ...f, [k]: e.target.value }); setErr(''); };
 
   const submit = async (e: React.FormEvent) => {
@@ -407,7 +417,7 @@ function PayForm({ deal }: { deal: Deal }) {
     setErr('');
     pushEvent({ event: 'begin_checkout', deal: deal.id, page: 'brand-reels' });
     if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('track', 'InitiateCheckout', { content_name: deal.name, currency: 'INR', value: Number(deal.price.replace(/[^\d]/g, '')) });
+      (window as any).fbq('track', 'InitiateCheckout', { content_name: deal.name, currency: 'INR', value: deal.amountPaise / 100 });
     }
     try {
       const res = await fetch('/api/checkout', {
@@ -442,7 +452,7 @@ function PayForm({ deal }: { deal: Deal }) {
       <button type="submit" className="bbr-cta-btn bbr-submit" disabled={busy}>
         {busy ? 'Opening secure checkout…' : <>Pay {deal.price} <ArrowRight className="bbr-cta-arrow" /></>}
       </button>
-      <p className="bbr-pay-note">Secure payment by Dodo Payments. We take your brief on WhatsApp right after.</p>
+      <p className="bbr-pay-note">Secure payment{provider ? ` by ${provider}` : ''}. We take your brief on WhatsApp right after.</p>
     </form>
   );
 }
